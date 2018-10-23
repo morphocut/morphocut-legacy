@@ -1,0 +1,146 @@
+# Lead Eagle
+
+Generic image processing pipeline.
+
+> Here we propose the **self-learning Helmholtz Imaging Pipeline** (sHIP) for **collaborative online  processing** of biological, medical, oceanographic and remote sensing imagery. Image processing often consists of **three basic processing steps: 1) segmentation** of one or several regions of interest (ROI) from the remaining image, **2) quantification** of certain characteristics such as the size, shape, color or texture of a given ROI and **3) classification** of a given ROI.
+
+## Inspiration
+
+- http://scantailor.org/
+- http://brain-maps.org/index.php?action=viewslides&datid=89&start=41
+
+## File formats
+
+- (DICOM Supplement 145: Whole Slide Microscopic Image IOD and SOP Classes)[ftp://medical.nema.org/medical/dicom/final/sup145_ft.pdf]
+- HDF5
+  - Large arrays
+  - Chunked, compressed storage
+  - Easy interfacing: https://www.h5py.org/
+
+## Tiling of large images
+
+- Software
+  - https://leafletjs.com/
+  - https://www.npmjs.com/package/vue2-leaflet
+  - https://stackoverflow.com/questions/17187161/bounding-view-of-a-leaflet-image-map-to-a-landscape-viewport
+  - https://iime.github.io/virtualmicroscope/
+  - https://stackoverflow.com/a/31529463/1116842
+  - https://stackoverflow.com/a/17199400/1116842
+
+- Tile size: 256 / 512px?
+
+| Zoom | Number of tiles |                          |
+| ---- | --------------- | ------------------------ |
+| 0    | 1               | Whole image in one tile. |
+| 1    | 4               |                          |
+| 2    | 8               |                          |
+
+
+
+## Backend
+
+- Flask / [Connexion](https://connexion.readthedocs.io/en/latest/index.html) (Public api)
+- PostgreSQL / PostGIS
+- SQLAlchemy Core
+- [GeoAlchemy](https://geoalchemy-2.readthedocs.io/en/latest/index.html) (extension to [SQLAlchemy](http://sqlalchemy.org) for working with spatial databases)
+- Pandas
+- [RQ](http://python-rq.org/) / [Flask-RQ2](https://flask-rq2.readthedocs.io/en/latest/)
+- [Redis](https://redis.io/)
+
+## Frontend
+
+- Vue
+- [Leaflet](https://leafletjs.com/)
+- [vue2-leaflet](https://www.npmjs.com/package/vue2-leaflet)
+- Image enhancement: http://camanjs.com/
+- https://github.com/Norkart/Leaflet-MiniMap
+
+**Attention:** Make sure to include Leaflet css.
+
+## Modules
+
+- **Data import:** Read and index input files
+  - Tokenize filenames
+    - regex
+    - https://pypi.org/project/parse/
+  - Later include HTTP/FTP-Upload
+- **Frame stitching:** Stitch images to make a whole
+  - https://docs.opencv.org/trunk/d8/d19/tutorial_stitcher.html: Does not directly work; not enough features?
+  - https://github.com/opencv/opencv/blob/master/samples/cpp/stitching_detailed.cpp
+  - https://www.pyimagesearch.com/2016/01/11/opencv-panorama-stitching/
+  - [Log-polar Transform](https://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#logpolar)? 
+
+- **Segmentation**
+  - Thresholding (various techniques)
+  - Deep learning
+  - Object size threshold
+  - Use uploaded segmentations
+- **Edit Segmentation**
+  - Merge segments
+  - Split segments
+  - Manually draw segments
+  - http://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html#leaflet-1-0-examples
+- **Measurement:** Measurement of object features
+- **Classification**
+  - Manually
+  - Automatically
+    - Random Forest
+    - Deep learning
+- **Data export**
+  - CSV and image files
+
+## Data
+
+### ImageBlob
+
+- ImageBlobID
+- Path
+- Metadata
+- Axes order (x, y, z, channels, time, ...)
+- Axes resolution / meaning
+- File type
+
+### Object
+
+- ObjectID
+- ImageBlobID
+- Bounding Box (PostGIS)
+- Metadata
+- Mask (1bit PNG)
+
+### Task
+
+One of the modules (import/export/calculations/...)
+
+- TaskID
+- Parameters
+- Type
+
+## Long-running jobs
+
+Everything that takes more than 0.5s-1s.
+
+- Use [Flask-RQ2](https://flask-rq2.readthedocs.io/en/latest/) to enqueue background jobs.
+
+## Misc
+
+- Splitting metadata field: https://stackoverflow.com/questions/38231591/splitting-dictionary-list-inside-a-pandas-column-into-separate-columns
+- Cache file handles for image blobs: https://cachetools.readthedocs.io/en/latest/#extending-cache-classes
+  - Might be an improvement when tiles have to be rendered
+
+## Paths (=Blueprints)
+
+- `/blobs/<imgblobid>`: Raw blob (might be large)
+- `/blobs/<imgblobid>/tiles/<z>/<x>/<y>`: Tiles of a large image
+- `/masks/<objid>.png?color=<color>`: Mask for a specific object (for overlay)
+
+## Manual Segmentation
+
+- Annotations:
+  - **Skeleton:** Connect inner parts of an object (certainly foreground).
+  - **Outline:** Draw the object boundaries (certainly background).
+  - **Point:** Designate an object.
+- Application cases:
+  - **Connect oversegmented parts of an object:** Draw skeleton lines connecting the individual segments.
+  - **Split touching objects:** Place markers on the respective object centers. The segment pixels will be assigned to object with the nearest annotation.
+  - **Separate overlapping objects:** After placing markers, draw skeleton lines of each object. The segment pixels will be assigned to object with the nearest annotation. Refine with object outlines.
