@@ -64,14 +64,18 @@ Generic image processing pipeline.
     - regex
     - https://pypi.org/project/parse/
   - Later include HTTP/FTP-Upload
+- **Restrict working area**
+  - User draws bounding box for the area that should be handled
+- **Lighting / shading / vignetting correction**
+  - Obtain correction image with gaussian filter: Leong et al. 2003. Correction of uneven illumination (vignetting) in digital microscopy images 
 - **Frame stitching:** Stitch images to make a whole
   - https://docs.opencv.org/trunk/d8/d19/tutorial_stitcher.html: Does not directly work; not enough features?
   - https://github.com/opencv/opencv/blob/master/samples/cpp/stitching_detailed.cpp
   - https://www.pyimagesearch.com/2016/01/11/opencv-panorama-stitching/
   - [Log-polar Transform](https://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#logpolar)? 
-
+  - Black box optimization?
 - **Segmentation**
-  - Thresholding (various techniques)
+  - Thresholding (various techniques: Otsu, Quantiles, ...)
   - Deep learning
   - Object size threshold
   - Use uploaded segmentations
@@ -88,6 +92,7 @@ Generic image processing pipeline.
     - Deep learning
 - **Data export**
   - CSV and image files
+  - Option: Augment Object of Interest?
 
 ## Data
 
@@ -144,3 +149,7 @@ Everything that takes more than 0.5s-1s.
   - **Connect oversegmented parts of an object:** Draw skeleton lines connecting the individual segments.
   - **Split touching objects:** Place markers on the respective object centers. The segment pixels will be assigned to object with the nearest annotation.
   - **Separate overlapping objects:** After placing markers, draw skeleton lines of each object. The segment pixels will be assigned to object with the nearest annotation. Refine with object outlines.
+
+## Environment
+
+- Python 3.6 (required by scikit-image)
