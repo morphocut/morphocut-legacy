@@ -16,6 +16,18 @@ Generic image processing pipeline.
   - Large arrays
   - Chunked, compressed storage
   - Easy interfacing: https://www.h5py.org/
+  - Discussion:
+    - https://cyrille.rossant.net/moving-away-hdf5/
+    - https://cyrille.rossant.net/should-you-use-hdf5/
+    - http://blog.khinsen.net/posts/2016/01/07/on-hdf5-and-the-future-of-data-management/
+- NetCDF4
+  - Built upon HDF5
+- [TileDB](https://docs.tiledb.io/en/latest/index.html)
+  - Speed
+  - Compression
+  - "immutable, append-only fragments" -> secure
+  - concurrent reads and writes
+  - Discussion: https://github.com/pangeo-data/pangeo/issues/120
 
 ## Tiling of large images
 
@@ -59,14 +71,14 @@ Generic image processing pipeline.
 
 ## Modules
 
-- **Data import:** Read and index input files
+- **Data import:** Read and index input files (Image location $\mapsto$ Image collection)
   - Tokenize filenames
     - regex
     - https://pypi.org/project/parse/
   - Later include HTTP/FTP-Upload
 - **Restrict working area**
   - User draws bounding box for the area that should be handled
-- **Lighting / shading / vignetting correction**
+- **Lighting / shading / vignetting correction **(Image collection (N) $\mapsto$ Image collection (N))
   - Obtain correction image with gaussian filter: Leong et al. 2003. Correction of uneven illumination (vignetting) in digital microscopy images 
 - **Frame stitching:** Stitch images to make a whole
   - https://docs.opencv.org/trunk/d8/d19/tutorial_stitcher.html: Does not directly work; not enough features?
@@ -74,17 +86,20 @@ Generic image processing pipeline.
   - https://www.pyimagesearch.com/2016/01/11/opencv-panorama-stitching/
   - [Log-polar Transform](https://docs.opencv.org/2.4/modules/imgproc/doc/geometric_transformations.html#logpolar)? 
   - Black box optimization?
-- **Segmentation**
+- **Segmentation:** Extract individual segments (Image collection (N) $\mapsto$ Mask collection (M))
   - Thresholding (various techniques: Otsu, Quantiles, ...)
   - Deep learning
   - Object size threshold
   - Use uploaded segmentations
-- **Edit Segmentation**
+- **Edit Segmentation** (Mask collection (M) | Image collection (N) $\mapsto$ Mask collection (M))
   - Merge segments
   - Split segments
   - Manually draw segments
   - http://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html#leaflet-1-0-examples
-- **Measurement:** Measurement of object features
+- **Measurement:** Measurement of object/shape features (Mask collection (M) $\mapsto$ Mask collection (M))
+  - [Contours in OpenCV](https://docs.opencv.org/3.1.0/d3/d05/tutorial_py_table_of_contents_contours.html)
+  - [skimage.measure.regionprops](http://scikit-image.org/docs/dev/api/skimage.measure.html#skimage.measure.regionprops)
+  - Which one is better?
 - **Classification**
   - Manually
   - Automatically
