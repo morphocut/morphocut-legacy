@@ -96,7 +96,7 @@ Generic image processing pipeline.
   - Split segments
   - Manually draw segments
   - http://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html#leaflet-1-0-examples
-- **Measurement:** Measurement of object/shape features (Mask collection (M) $\mapsto$ Mask collection (M))
+- **Measurement:** Measurement of object/shape features (like ZooProcess; Mask collection (M) $\mapsto$ Mask collection (M))
   - [Contours in OpenCV](https://docs.opencv.org/3.1.0/d3/d05/tutorial_py_table_of_contents_contours.html)
   - [skimage.measure.regionprops](http://scikit-image.org/docs/dev/api/skimage.measure.html#skimage.measure.regionprops)
   - Which one is better?
@@ -106,8 +106,10 @@ Generic image processing pipeline.
     - Random Forest
     - Deep learning
 - **Data export**
-  - CSV and image files
+  - CSV and image files (raw, rendered, mask, ...)
   - Option: Augment Object of Interest?
+- **Part annotation & measurement:** Annotation of body parts (intestinces, extremities, ...) and their measurement.
+  - Automatically transfer manual annotations
 
 ## Data
 
