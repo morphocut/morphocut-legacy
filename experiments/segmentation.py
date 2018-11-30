@@ -99,13 +99,16 @@ def import_image():
         print('Argument missing. Please provide a valid path to an image file.')
         exit(0)
 
-    source_filename = sys.argv[1]
+    source_filepath = sys.argv[1]
+    _, fileName = os.path.split(source_filepath)
 
-    object_id = parse("{}.{}", source_filename)[0]
-    # object_id = 'T4 200a-04'
+    object_id = parse("{}.{}", fileName)[0]
 
-    src = cv.imread(source_filename)
+    src = cv.imread(source_filepath)
     original = src
+
+    # cv.imshow("", original)
+    # cv.waitKey()
 
     if src is None:
         print('Could not open or find the image:', args.input)
@@ -145,25 +148,9 @@ def flatten_colors(src, K=4):
 def process_image(src, original):
     # ----------------START IMAGE PROCESSING------------------------
 
-    # Show source image
-
-    imageSize = 0.4
-
-    src = cv.resize(src, None, fx=imageSize, fy=imageSize)
-
-    # cv.imshow('Source Image', original)
-
     src = flatten_colors(src)
 
     src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
-
-    # src = cv.GaussianBlur(src,(11,11),0)
-
-    src = cv.resize(src, None, fx=1/imageSize, fy=1/imageSize)
-
-    # src = cv.equalizeHist(src)
-
-    cv.imwrite('grey_blur_image.png', src)
 
     # _ ,mask = cv.threshold(src, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
     # mask = cv.bitwise_not(mask)
@@ -175,20 +162,16 @@ def process_image(src, original):
     # kernel = np.ones((5,5), np.uint8) 
     # mask = cv.dilate(mask, kernel, iterations=1) 
 
-    # cv.imshow('Threshold Image', mask)
-
     _, markers = cv.connectedComponents(mask)
 
-    # cv.imshow('Marker Image', markers)
-
+    # retrieve regionprops of the connected components and filter those who are smaller than 15 pixels in area
+    areaThreshold = 15
     properties = measure.regionprops(markers, coordinates='rc')
-    # properties = [p for p in properties if p.area > 10]
-    # print(str(centroids))
+    properties = [p for p in properties if p.area > areaThreshold]
+
     print(str(len(properties))+' objects found!')
 
     masked = cv.bitwise_and(original,original,mask = mask)
-
-    # cv.imshow('Masked Image', masked)
 
     return src, mask, properties
     # ----------------END IMAGE PROCESSING------------------------
@@ -198,6 +181,11 @@ def export(original, mask, properties, object_id):
     # ----------------START EXPORTING------------------------
 
     print('exporting object properties!')
+
+    dirName = 'segmentation_export'
+    if not os.path.exists(dirName):
+        os.makedirs(dirName)
+
     prop_list = get_properties_list(properties, object_id)
     prop_frame = pd.DataFrame(prop_list)
     filepath = os.path.join('segmentation_export', 'export.csv')
