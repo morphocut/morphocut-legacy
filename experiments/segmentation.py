@@ -8,21 +8,26 @@ from parse import *
 import sys
 from etaprogress.progress import ProgressBar
 import matplotlib.pyplot as plt
+import datetime
 
 
-def get_properties_list(properties, object_id):
+def get_properties_list(original):
     '''
-    Iterates through the regionprops and adds them to a list of dictionaries. 
-    
+    Iterates through the regionprops and adds them to a list of dictionaries.
+
     Returns: the list of dictionaries
     '''
     prop_list = []
-    for property in properties:
-        propDict = {'img_file_name':  object_id+'_'+str(property.label)+'.png',
-                        'object_id':  object_id+'_'+str(property.label),
+    i = 1
+    for property in original['properties']:
+        propDict = {'img_file_name':  original['object_id']+'_'+str(i)+'.png',
+                        'object_id':  original['object_id']+'_'+str(i),
 
                         'centroid_row':  property.centroid[0],
                         'centroid_col':  property.centroid[1],
+
+                        'position_row':  property.coords[0],
+                        'position_col':  property.coords[1],
 
                         'diameter_equivalent':  property.equivalent_diameter,
                         'length_minor_axis':  property.minor_axis_length,
@@ -43,17 +48,18 @@ def get_properties_list(properties, object_id):
 
                         'countCoords':  len(property.coords)}
         prop_list.append(propDict)
+        i += 1
     return prop_list
 
 
-def export_image_regions(properties, object_id, original, mask):
+def export_image_regions(original):
     '''
     Iterates through the region properties and exports images containing each object
     '''
-    print('exporting object images!')
+    print(original['object_id']+': exporting object images!')
     i = 0
-    bar = ProgressBar(len(properties), max_width=40)
-    for property in properties:
+    bar = ProgressBar(len(original['properties']), max_width=40)
+    for property in original['properties']:
         # print('exporting object: '+str(i))
         x = property.bbox[0]
         y = property.bbox[1]
@@ -64,11 +70,11 @@ def export_image_regions(properties, object_id, original, mask):
         bordersize_h = int(h / 2)
 
         xmin = max(0, x-bordersize_w)
-        xmax = min(original.shape[0], x+w+bordersize_w)
+        xmax = min(original['img'].shape[0], x+w+bordersize_w)
         ymin = max(0, y-bordersize_h)
-        ymax = min(original.shape[1], y+h+bordersize_h)
+        ymax = min(original['img'].shape[1], y+h+bordersize_h)
 
-        original_masked = original[xmin:xmax, ymin:ymax]
+        original_masked = original['img'][xmin:xmax, ymin:ymax]
         object_image = original_masked
         # mask_masked = mask[x:x+w, y:y+h]
 
@@ -82,7 +88,7 @@ def export_image_regions(properties, object_id, original, mask):
         # object_image = cv.copyMakeBorder(object_image, top=bordersize, bottom=bordersize, left=bordersize,
         #                     right=bordersize, borderType=cv.BORDER_CONSTANT, value=[255, 255, 255])
 
-        filename = object_id+'_'+str(property.label)+'.png'
+        filename = original['object_id']+'_'+str(i)+'.png'
         filepath = os.path.join('segmentation_export', filename)
         cv.imwrite(filepath, object_image)
         i += 1
@@ -92,29 +98,46 @@ def export_image_regions(properties, object_id, original, mask):
     print()
 
 
-def import_image():
+def import_data():
     # ----------------START IMPORTING------------------------
 
     if len(sys.argv) < 2:
         print('Argument missing. Please provide a valid path to an image file.')
         exit(0)
+        
+    originals = []
 
-    source_filepath = sys.argv[1]
-    _, fileName = os.path.split(source_filepath)
+    source_filePath = sys.argv[1]
+    folderName, fileName = os.path.split(source_filePath)
 
-    object_id = parse("{}.{}", fileName)[0]
+    if (fileName.endswith('.jpeg')):
+        print('importing '+source_filePath)
+        object_id = parse("{}.{}", fileName)[0]
+        img = cv.imread(source_filePath)
+        originals.append(dict(object_id=object_id, img=img))
+    else:
+        for root, dirs, files in os.walk(source_filePath, topdown=False):
+            for name in files:
+                if (name.endswith('.jpeg')):
+                    print('importing '+os.path.join(root, name))
+                    filePath = os.path.join(root, name)
+                    object_id = parse("{}.{}", name)[0]
+                    img = cv.imread(filePath)
+                    originals.append(dict(object_id=object_id, img=img))
 
-    src = cv.imread(source_filepath)
-    original = src
+    # object_id = parse("{}.{}", fileName)[0]
+
+    # src = cv.imread(source_filepath)
+    # original = src
 
     # cv.imshow("", original)
     # cv.waitKey()
 
-    if src is None:
-        print('Could not open or find the image:', args.input)
-        exit(0)
+    # if src is None:
+    #     print('Could not open or find the image:', args.input)
+    #     exit(0)
 
-    return src, original, object_id
+    return originals
 
 
     # ----------------END IMPORTING------------------------
@@ -145,8 +168,10 @@ def flatten_colors(src, K=4):
     return res2
 
 
-def process_image(src, original):
+def process_single_image(original):
     # ----------------START IMAGE PROCESSING------------------------
+
+    src = original['img']
 
     src = flatten_colors(src)
 
@@ -169,34 +194,58 @@ def process_image(src, original):
     properties = measure.regionprops(markers, coordinates='rc')
     properties = [p for p in properties if p.area > areaThreshold]
 
-    print(str(len(properties))+' objects found!')
+    print(original['object_id']+': '+str(len(properties))+' objects found!')
 
-    masked = cv.bitwise_and(original,original,mask = mask)
+    masked = cv.bitwise_and(original['img'],original['img'],mask = mask)
 
-    return src, mask, properties
+    original['mask'] = mask
+    original['properties'] = properties
+
+    # return src, mask, properties
     # ----------------END IMAGE PROCESSING------------------------
 
 
-def export(original, mask, properties, object_id):
+def export_data(originals):
     # ----------------START EXPORTING------------------------
 
-    print('exporting object properties!')
+    # print('exporting object properties!')
 
     dirName = 'segmentation_export'
     if not os.path.exists(dirName):
         os.makedirs(dirName)
 
-    prop_list = get_properties_list(properties, object_id)
+    # with ZipFile('segmentation_export_'+datetime.datetime.now+'.zip', 'w') as myzip:
+        # myzip.write('eggs.txt')
+
+    prop_list = []
+    for original in originals:
+        prop_list_single = get_properties_list(original)
+        prop_list.extend(prop_list_single)
+        export_image_regions(original)
+
     prop_frame = pd.DataFrame(prop_list)
-    filepath = os.path.join('segmentation_export', 'export.csv')
+    filepath = os.path.join('segmentation_export', 'segmentation_export.tsv')
     prop_frame.to_csv(filepath, sep='\t', encoding='utf-8', index=False)
 
-    mask_color = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
-    masked_overlay = cv.addWeighted(original, 0.7, mask_color, 0.3, 0)
-    cv.imwrite('masked.png', masked_overlay)
+    general_properties = []
+    for original in originals:
+        total_area = original['img'].shape[0] * original['img'].shape[1]
+        total_area_filled = 0
+        for p in original['properties']:
+            total_area_filled += p.area
+        propDict = {'object_id':  original['object_id'],
+                    'total_area': total_area,
+                    'total_area_filled': total_area_filled, 
+                    'area_filled': (total_area_filled / total_area)}
+        general_properties.append(propDict)
 
+    prop_frame = pd.DataFrame(general_properties)
+    filepath = os.path.join('segmentation_export', 'general_properties_export.tsv')
+    prop_frame.to_csv(filepath, sep='\t', encoding='utf-8', index=False)
 
-    export_image_regions(properties, object_id, original, mask)
+    # mask_color = cv.cvtColor(mask, cv.COLOR_GRAY2BGR)
+    # masked_overlay = cv.addWeighted(original, 0.7, mask_color, 0.3, 0)
+    # cv.imwrite('masked.png', masked_overlay)
 
 
     # ----------------END EXPORTING------------------------
@@ -205,9 +254,14 @@ def export(original, mask, properties, object_id):
 
 
 if __name__ == "__main__":
-    src, original, object_id = import_image()
-    src, mask, properties = process_image(src, original)
-    export(original, mask, properties, object_id)
+    originals = import_data()
+    for original in originals:
+        process_single_image(original)
+    export_data(originals)
+
+
+    # src, mask, properties = process_single_image(src, original)
+    # export_data(original, mask, properties, object_id)
 
 
 
