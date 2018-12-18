@@ -14,15 +14,7 @@ from zipfile import ZipFile
 import zipfile
 
 
-def get_properties_list(original):
-    '''
-    Iterates through the regionprops and adds them to a list of dictionaries.
-
-    Returns: the list of dictionaries
-    '''
-    prop_list = []
-    i = 1
-
+def get_property_column_types():
     propDict = {'img_file_name':  '[t]',
                 'img_rank':  '[f]',
 
@@ -57,63 +49,73 @@ def get_properties_list(original):
                 'object_perimmajor':  '[f]',
                 'object_circex':  '[f]',
                 'object_cdexc':  '[f]',
-                'object_annotation_date':  '[t]',
-                'object_annotation_time':  '[t]',
-                'object_annotation_category':  '[t]',
-                'object_annotation_person_name':  '[t]',
-                'object_annotation_person_email':  '[t]',
-                'object_annotation_status':  '[t]',
+                # 'object_annotation_date':  '[t]',
+                # 'object_annotation_time':  '[t]',
+                # 'object_annotation_category':  '[t]',
+                # 'object_annotation_person_name':  '[t]',
+                # 'object_annotation_person_email':  '[t]',
+                # 'object_annotation_status':  '[t]',
 
-                'process_id':  '[t]',
-                'process_date':  '[t]',
-                'process_time':  '[t]',
-                'process_software':  '[t]',
-                'process_first_img':  '[f]',
-                'process_last_img':  '[f]',
-                'process_pressure_gain':  '[f]',
-                'process_calibration':  '[t]',
-                'process_pixel':  '[f]',
-                'process_upper':  '[f]',
-                'process_gamma':  '[f]',
-                'process_esdmin':  '[f]',
-                'process_esdmax':  '[f]',
+                # 'process_id':  '[t]',
+                # 'process_date':  '[t]',
+                # 'process_time':  '[t]',
+                # 'process_software':  '[t]',
+                # 'process_first_img':  '[f]',
+                # 'process_last_img':  '[f]',
+                # 'process_pressure_gain':  '[f]',
+                # 'process_calibration':  '[t]',
+                # 'process_pixel':  '[f]',
+                # 'process_upper':  '[f]',
+                # 'process_gamma':  '[f]',
+                # 'process_esdmin':  '[f]',
+                # 'process_esdmax':  '[f]',
 
-                'acq_id':  '[t]',
-                'acq_sn':  '[t]',
-                'acq_volimage':  '[f]',
-                'acq_aa':  '[f]',
-                'acq_exp':  '[f]',
-                'acq_pixel':  '[f]',
-                'acq_file_description':  '[t]',
-                'acq_tasktype':  '[f]',
-                'acq_disktype':  '[f]',
-                'acq_shutterspeed':  '[f]',
-                'acq_gain':  '[f]',
-                'acq_threshold':  '[f]',
-                'acq_smbase':  '[f]',
-                'acq_smzoo':  '[f]',
-                'acq_erase_border_blob':  '[f]',
-                'acq_choice':  '[f]',
-                'acq_ratio':  '[f]',
+                # 'acq_id':  '[t]',
+                # 'acq_sn':  '[t]',
+                # 'acq_volimage':  '[f]',
+                # 'acq_aa':  '[f]',
+                # 'acq_exp':  '[f]',
+                # 'acq_pixel':  '[f]',
+                # 'acq_file_description':  '[t]',
+                # 'acq_tasktype':  '[f]',
+                # 'acq_disktype':  '[f]',
+                # 'acq_shutterspeed':  '[f]',
+                # 'acq_gain':  '[f]',
+                # 'acq_threshold':  '[f]',
+                # 'acq_smbase':  '[f]',
+                # 'acq_smzoo':  '[f]',
+                # 'acq_erase_border_blob':  '[f]',
+                # 'acq_choice':  '[f]',
+                # 'acq_ratio':  '[f]',
 
-                'sample_id':  '[t]',
-                'sample_profileid':  '[t]',
-                'sample_cruise':  '[t]',
-                'sample_ship':  '[t]',
-                'sample_stationid':  '[t]',
-                'sample_bottomdepth':  '[t]',
-                'sample_ctdrosettefilename':  '[t]',
-                'sample_dn':  '[t]',
-                'sample_winddir':  '[f]',
-                'sample_windspeed':  '[f]',
-                'sample_seastate':  '[f]',
-                'sample_nebulousness':  '[f]',
-                'sample_yoyo':  '[t]',
-                'sample_comment':  '[t]',
-                'sample_dataportal_descripteur':  '[t]',
-                'sample_barcode':  '[t]',
+                # 'sample_id':  '[t]',
+                # 'sample_profileid':  '[t]',
+                # 'sample_cruise':  '[t]',
+                # 'sample_ship':  '[t]',
+                # 'sample_stationid':  '[t]',
+                # 'sample_bottomdepth':  '[t]',
+                # 'sample_ctdrosettefilename':  '[t]',
+                # 'sample_dn':  '[t]',
+                # 'sample_winddir':  '[f]',
+                # 'sample_windspeed':  '[f]',
+                # 'sample_seastate':  '[f]',
+                # 'sample_nebulousness':  '[f]',
+                # 'sample_yoyo':  '[t]',
+                # 'sample_comment':  '[t]',
+                # 'sample_dataportal_descripteur':  '[t]',
+                # 'sample_barcode':  '[t]',
                 }
-    prop_list.append(propDict)
+    return propDict
+
+
+def get_properties_list(original):
+    '''
+    Iterates through the regionprops and adds them to a list of dictionaries.
+
+    Returns: the list of dictionaries
+    '''
+    prop_list = []
+    i = 1
 
     for property in original['properties']:
         propDict = {'img_file_name':  str(original['object_id']+'_'+str(i)+'.png'),
@@ -150,61 +152,61 @@ def get_properties_list(original):
                     'object_perimmajor':  'nan',
                     'object_circex':  'nan',
                     'object_cdexc':  'nan',
-                    'object_annotation_date':  'nan',
-                    'object_annotation_time':  'nan',
-                    'object_annotation_category':  'nan',
-                    'object_annotation_person_name':  'nan',
-                    'object_annotation_person_email':  'nan',
-                    'object_annotation_status':  'nan',
+                    # 'object_annotation_date':  'nan',
+                    # 'object_annotation_time':  'nan',
+                    # 'object_annotation_category':  'nan',
+                    # 'object_annotation_person_name':  'nan',
+                    # 'object_annotation_person_email':  'nan',
+                    # 'object_annotation_status':  'nan',
 
-                    'process_id':  'nan',
-                    'process_date':  'nan',
-                    'process_time':  'nan',
-                    'process_software':  'nan',
-                    'process_first_img':  'nan',
-                    'process_last_img':  'nan',
-                    'process_pressure_gain':  'nan',
-                    'process_calibration':  'nan',
-                    'process_pixel':  'nan',
-                    'process_upper':  'nan',
-                    'process_gamma':  'nan',
-                    'process_esdmin':  'nan',
-                    'process_esdmax':  'nan',
+                    # 'process_id':  'nan',
+                    # 'process_date':  'nan',
+                    # 'process_time':  'nan',
+                    # 'process_software':  'nan',
+                    # 'process_first_img':  'nan',
+                    # 'process_last_img':  'nan',
+                    # 'process_pressure_gain':  'nan',
+                    # 'process_calibration':  'nan',
+                    # 'process_pixel':  'nan',
+                    # 'process_upper':  'nan',
+                    # 'process_gamma':  'nan',
+                    # 'process_esdmin':  'nan',
+                    # 'process_esdmax':  'nan',
 
-                    'acq_id':  'nan',
-                    'acq_sn':  'nan',
-                    'acq_volimage':  'nan',
-                    'acq_aa':  'nan',
-                    'acq_exp':  'nan',
-                    'acq_pixel':  'nan',
-                    'acq_file_description':  'nan',
-                    'acq_tasktype':  'nan',
-                    'acq_disktype':  'nan',
-                    'acq_shutterspeed':  'nan',
-                    'acq_gain':  'nan',
-                    'acq_threshold':  'nan',
-                    'acq_smbase':  'nan',
-                    'acq_smzoo':  'nan',
-                    'acq_erase_border_blob':  'nan',
-                    'acq_choice':  'nan',
-                    'acq_ratio':  'nan',
+                    # 'acq_id':  'nan',
+                    # 'acq_sn':  'nan',
+                    # 'acq_volimage':  'nan',
+                    # 'acq_aa':  'nan',
+                    # 'acq_exp':  'nan',
+                    # 'acq_pixel':  'nan',
+                    # 'acq_file_description':  'nan',
+                    # 'acq_tasktype':  'nan',
+                    # 'acq_disktype':  'nan',
+                    # 'acq_shutterspeed':  'nan',
+                    # 'acq_gain':  'nan',
+                    # 'acq_threshold':  'nan',
+                    # 'acq_smbase':  'nan',
+                    # 'acq_smzoo':  'nan',
+                    # 'acq_erase_border_blob':  'nan',
+                    # 'acq_choice':  'nan',
+                    # 'acq_ratio':  'nan',
 
-                    'sample_id':  'nan',
-                    'sample_profileid':  'nan',
-                    'sample_cruise':  'nan',
-                    'sample_ship':  'nan',
-                    'sample_stationid':  'nan',
-                    'sample_bottomdepth':  'nan',
-                    'sample_ctdrosettefilename':  'nan',
-                    'sample_dn':  'nan',
-                    'sample_winddir':  'nan',
-                    'sample_windspeed':  'nan',
-                    'sample_seastate':  'nan',
-                    'sample_nebulousness':  'nan',
-                    'sample_yoyo':  'nan',
-                    'sample_comment':  'nan',
-                    'sample_dataportal_descripteur':  'nan',
-                    'sample_barcode':  'nan',
+                    # 'sample_id':  'nan',
+                    # 'sample_profileid':  'nan',
+                    # 'sample_cruise':  'nan',
+                    # 'sample_ship':  'nan',
+                    # 'sample_stationid':  'nan',
+                    # 'sample_bottomdepth':  'nan',
+                    # 'sample_ctdrosettefilename':  'nan',
+                    # 'sample_dn':  'nan',
+                    # 'sample_winddir':  'nan',
+                    # 'sample_windspeed':  'nan',
+                    # 'sample_seastate':  'nan',
+                    # 'sample_nebulousness':  'nan',
+                    # 'sample_yoyo':  'nan',
+                    # 'sample_comment':  'nan',
+                    # 'sample_dataportal_descripteur':  'nan',
+                    # 'sample_barcode':  'nan',
 
 
 
@@ -262,7 +264,9 @@ def export_image_regions(original, zip):
         ymax = min(original['img'].shape[1], y+h+bordersize_h)
 
         original_masked = original['img'][xmin:xmax, ymin:ymax]
-        object_image = original_masked
+        contours_masked = original['contour_img'][xmin:xmax, ymin:ymax]
+
+        # object_image = original_masked
         # mask_masked = mask[x:x+w, y:y+h]
 
         # object_image = cv.bitwise_and(
@@ -276,12 +280,12 @@ def export_image_regions(original, zip):
         #                     right=bordersize, borderType=cv.BORDER_CONSTANT, value=[255, 255, 255])
 
         filename = original['object_id']+'_'+str(i)+'.png'
-        # filepath = os.path.join('segmentation_export', filename)
-        filepath = filename
+        img_str = cv.imencode('.png', original_masked)[1].tostring()
+        zip.writestr(filename, img_str)
 
-        # cv.imwrite(filepath, object_image)
-        img_str = cv.imencode('.png', object_image)[1].tostring()
-        zip.writestr(filepath, img_str)
+        filename = original['object_id']+'_'+str(i)+'_contours.png'
+        img_str = cv.imencode('.png', contours_masked)[1].tostring()
+        zip.writestr(filename, img_str)
 
         i += 1
         bar.numerator += 1
@@ -367,26 +371,36 @@ def process_single_image(original):
     properties = measure.regionprops(markers, coordinates='rc')
     properties = [p for p in properties if p.area > areaThreshold]
 
+    c_img, contours, hierarchy = cv.findContours(mask, 1, 2)
+    contour_image = original['img'].copy()
+    cv.drawContours(contour_image, contours, -1, (0,255,0), 1)
+
+
+    # cv.imshow('contour image', contour_image)
+    # cv.waitKey()
+
     print(original['object_id']+': '+str(len(properties))+' objects found!')
 
     masked = cv.bitwise_and(original['img'], original['img'], mask=mask)
 
     original['mask'] = mask
     original['properties'] = properties
+    original['contour_img'] = contour_image
 
 
 def export_data(originals):
 
-    dirName = 'segmentation_export'
-    if not os.path.exists(dirName):
-        os.makedirs(dirName)
+    # dirName = 'segmentation_export'
+    # if not os.path.exists(dirName):
+    #     os.makedirs(dirName)
 
-    zip_filepath = 'segmentation_export_' + \
+    zip_filepath = 'ecotaxa_segmentation_' + \
         str(datetime.datetime.now().strftime('%Y_%m_%d'))+'.zip'
 
     with ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as myzip:
 
         prop_list = []
+        prop_list.insert(0, get_property_column_types())
         for original in originals:
             prop_list_single = get_properties_list(original)
             prop_list.extend(prop_list_single)
@@ -394,7 +408,7 @@ def export_data(originals):
         prop_frame = pd.DataFrame(prop_list)
 
         sio = StringIO()
-        filepath = 'segmentation_export.tsv'
+        filepath = 'ecotaxa_segmentation.tsv'
         prop_frame.to_csv(sio, sep='\t', encoding='utf-8', index=False)
         myzip.writestr(filepath, sio.getvalue())
 
@@ -412,7 +426,7 @@ def export_data(originals):
         prop_frame = pd.DataFrame(general_properties)
 
         sio = StringIO()
-        filepath = 'general_properties_export.tsv'
+        filepath = 'ecotaxa_general.tsv'
         prop_frame.to_csv(sio, sep='\t', encoding='utf-8', index=False)
         myzip.writestr(filepath, sio.getvalue())
 

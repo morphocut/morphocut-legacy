@@ -1,6 +1,9 @@
 import Vue from 'vue'
 import Router from 'vue-router'
 import Home from './views/Home.vue'
+import Ping from '@/components/Ping';
+import Upload from '@/components/Upload';
+import Dataset from '@/components/Dataset';
 
 Vue.use(Router)
 
@@ -20,6 +23,21 @@ export default new Router({
       // this generates a separate chunk (about.[hash].js) for this route
       // which is lazy-loaded when the route is visited.
       component: () => import(/* webpackChunkName: "tiles" */ './views/Tiles.vue')
-    }
+    },
+    {
+      path: '/ping',
+      name: 'Ping',
+      component: Ping,
+    },
+    {
+      path: '/upload',
+      name: 'Upload',
+      component: Upload,
+    },
+    {
+      path: '/datasets',
+      name: 'Dataset',
+      component: Dataset,
+    },
   ]
 })
