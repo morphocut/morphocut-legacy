@@ -51,9 +51,9 @@ Generic image processing pipeline.
 
 ## Backend
 
-- Flask / [Connexion](https://connexion.readthedocs.io/en/latest/index.html) (Public api)
+- Flask
 - PostgreSQL / PostGIS
-- SQLAlchemy Core
+- SQLAlchemy Core + ORM
 - [GeoAlchemy](https://geoalchemy-2.readthedocs.io/en/latest/index.html) (extension to [SQLAlchemy](http://sqlalchemy.org) for working with spatial databases)
 - Pandas
 - [RQ](http://python-rq.org/) / [Flask-RQ2](https://flask-rq2.readthedocs.io/en/latest/)
@@ -76,10 +76,19 @@ Generic image processing pipeline.
     - regex
     - https://pypi.org/project/parse/
   - Later include HTTP/FTP-Upload
+  - Read EXIF info
+  - HTTP directory upload
+    - https://stackoverflow.com/a/5849341/1116842
+    - https://serversideup.net/uploading-files-vuejs-axios/
+    - https://serversideup.net/drag-and-drop-file-uploads-with-vuejs-and-axios/
+    - https://github.com/rowanwins/vue-dropzone
 - **Restrict working area**
   - User draws bounding box for the area that should be handled
 - **Lighting / shading / vignetting correction **(Image collection (N) $\mapsto$ Image collection (N))
   - Obtain correction image with gaussian filter: Leong et al. 2003. Correction of uneven illumination (vignetting) in digital microscopy images 
+  - Maybe improve with local background extraction and impainting of foreground objects:
+    - [Local Otsu](http://scikit-image.org/docs/dev/auto_examples/xx_applications/plot_rank_filters.html#image-threshold)
+    - [Inpainting](https://docs.opencv.org/3.4/df/d3d/tutorial_py_inpainting.html)
 - **Frame stitching:** Stitch images to make a whole
   - https://docs.opencv.org/trunk/d8/d19/tutorial_stitcher.html: Does not directly work; not enough features?
   - https://github.com/opencv/opencv/blob/master/samples/cpp/stitching_detailed.cpp
@@ -96,20 +105,21 @@ Generic image processing pipeline.
   - Split segments
   - Manually draw segments
   - http://leaflet.github.io/Leaflet.draw/docs/leaflet-draw-latest.html#leaflet-1-0-examples
-- **Measurement:** Measurement of object/shape features (like ZooProcess; Mask collection (M) $\mapsto$ Mask collection (M))
+- **Measurement:** Measurement of object/shape features (Mask collection (M) $\mapsto$ Mask collection (M))
   - [Contours in OpenCV](https://docs.opencv.org/3.1.0/d3/d05/tutorial_py_table_of_contents_contours.html)
   - [skimage.measure.regionprops](http://scikit-image.org/docs/dev/api/skimage.measure.html#skimage.measure.regionprops)
   - Which one is better?
+  - [Implementation by Jean-Olivier Irisson](https://github.com/jiho/apeep/blob/master/segment.py)
+  - [skimage.morphology.skeletonize](http://scikit-image.org/docs/dev/auto_examples/edges/plot_skeleton.html)
 - **Classification**
   - Manually
   - Automatically
     - Random Forest
     - Deep learning
 - **Data export**
-  - CSV and image files (raw, rendered, mask, ...)
+  - CSV and image files
+  - Export measurements in `object_*` columns
   - Option: Augment Object of Interest?
-- **Part annotation & measurement:** Annotation of body parts (intestinces, extremities, ...) and their measurement.
-  - Automatically transfer manual annotations
 
 ## Data
 
@@ -169,4 +179,22 @@ Everything that takes more than 0.5s-1s.
 
 ## Environment
 
-- Python 3.6 (required by scikit-image)
+- Python 3.7
+
+## Module-UI-interaction
+
+A processing node provides a data structure that completely describes the required configuration settings.
+
+- https://www.npmjs.com/package/vue-form-generator
+
+## API
+
+- REST
+- No framework (Flask-RESTful, Flask-Restless, ...) because too inflexible.
+- http://www.bradcypert.com/writing-a-restful-api-in-flask-sqlalchemy/
+
+## Database
+
+- SQLAlchemy ORM
+- http://flask-sqlalchemy.pocoo.org/2.3/models/
+
