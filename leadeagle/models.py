@@ -14,7 +14,8 @@ metadata = database.metadata
 datasets = Table('datasets', metadata,
     Column('dataset_id', Integer, primary_key=True),
     Column('name', String),
-    Column('objects', Integer),
+    Column('author', String),
+    Column('active', Boolean),
     Column('creation_date', DateTime,
         default=datetime.datetime.now),
 )
@@ -22,8 +23,15 @@ datasets = Table('datasets', metadata,
 #: :type objects: sqlalchemy.sql.schema.Table
 objects = Table('objects', metadata,
     Column('object_id', Integer, primary_key=True),
-    Column('filepath', String),
+    Column('filename', String),
     Column('creation_date', DateTime,
         default=datetime.datetime.now),
     Column('dataset_id', Integer, ForeignKey('datasets.dataset_id'), index=True),
+)
+
+#: :type objects: sqlalchemy.sql.schema.Table
+users = Table('users', metadata,
+    Column('user_id', Integer, primary_key=True),
+    Column('name', String),
+    Column('email', String),
 )

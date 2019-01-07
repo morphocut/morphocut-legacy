@@ -1,22 +1,60 @@
 <template>
   <div class="home">
-    <router-link to="/tiles">Tiles</router-link>
-    <!-- <router-link to="/ping">Ping</router-link>
-    <router-link to="/upload">Upload</router-link> -->
-    <router-link to="/datasets">Datasets</router-link>
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <!-- <HelloWorld msg="Welcome to Your Vue.js App"/> -->
+    <!-- <button type="button" class="btn btn-primary">Button</button> -->
+    <div>
+      <img alt="Vue logo" src="../assets/logo.png">
+    </div>
+    <div class="col col-12">
+      <div class="row">
+        <div class="centering">
+          <b-button to="/datasets" variant="primary">Datasets</b-button>
+        </div>
+      </div>
+      <div class="row">
+        <div class="divider">
+        </div>
+      </div>
+      <div class="row">
+        <div class="centering">
+          <b-button to="/tiles">Tiles</b-button>
+          <b-button :to="{ name: 'Ping', params: { userId: 123 }}">Ping</b-button>
+          <b-button to="/upload">Upload</b-button>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import HelloWorld from "@/components/HelloWorld.vue";
 
 export default {
-  name: 'home',
+  name: "home",
   components: {
     HelloWorld
   }
-}
+};
 </script>
+
+<style>
+b-button {
+  margin: 2px;
+}
+.row {
+  margin: 0.5rem;
+}
+.centering {
+  text-align: center;
+  width: 100%;
+}
+.divider {
+  position: absolute;
+  height: 1px;
+  width: 80%;
+  left: 10%;
+  background: grey;
+}
+</style>
+

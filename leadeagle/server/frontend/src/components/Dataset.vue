@@ -24,8 +24,10 @@
               <td>{{ dataset.name }}</td>
               <td>{{ dataset.objects }}</td>
               <td>
-                <button type="button" class="btn btn-warning btn-sm">Update</button>
-                <button type="button" class="btn btn-danger btn-sm">Delete</button>
+                <b-button type="button" class="btn btn-warning btn-sm" :to="{ name: 'Upload', params: { dataset: dataset }}">Edit
+                  <!-- <router-link :to="{ name: 'Upload', params: { dataset: 123 }}">Edit</router-link> -->
+                </b-button>
+                <button type="button" class="btn btn-danger btn-sm" style="margin-left: 0.5rem;" v-on:click="removeDataset(dataset.id)">Delete</button>
               </td>
             </tr>
           </tbody>
@@ -79,9 +81,12 @@ export default {
         id: 0,
         name: "",
         objects: 0
-      },
+      }
     };
   },
+  // props: {
+  //   dataset
+  // },
   methods: {
     getDatasets() {
       const path = "http://localhost:5000/datasets";
@@ -108,6 +113,20 @@ export default {
           console.log(error);
           this.getDatasets();
         });
+    },
+    removeDataset(id) {
+      console.log("remove dataset: "+id);
+      // const path = "http://localhost:5000/datasets";
+      // axios
+      //   .post(path, payload)
+      //   .then(() => {
+      //     this.getDatasets();
+      //   })
+      //   .catch(error => {
+      //     // eslint-disable-next-line
+      //     console.log(error);
+      //     this.getDatasets();
+      //   });
     },
     initForm() {
       this.addDatasetForm.id = 0;

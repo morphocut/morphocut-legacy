@@ -13,12 +13,16 @@ import pandas as pd
 from etaprogress.progress import ProgressBar
 from flask import (Flask, Response, abort, redirect, render_template, request,
                    url_for)
+import json
+
 from flask.helpers import send_from_directory
+from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import bindparam
 from sqlalchemy.sql import select, and_, union, intersect
 from timer_cm import Timer
 from werkzeug.security import check_password_hash, generate_password_hash
+from werkzeug.utils import secure_filename
 
 from leadeagle import models
 from leadeagle.extensions import database, migrate, redis_store
@@ -105,16 +109,65 @@ def all_datasets():
     return jsonify(response_object)
 
 
+@app.route('/upload', methods=['GET', 'POST', 'PUT'])
+def upload():
+    response_object = {'status': 'success'}
+    print('upload '+str(request.method)+'\n')
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            flash('No file part')
+            return redirect(request.url)
+        file = request.files['file']
+        dataset = json.loads(request.form['dataset'])
+        print(str(dataset))
+        # if user does not select file, browser also
+        # submit an empty part without filename
+        if file.filename == '':
+            flash('No selected file')
+            # return redirect(request.url)
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            _object = {
+                'filename': os.path.join(app.config['UPLOAD_FOLDER'], filename),
+                'dataset_id': dataset['id']
+            }
+            add_object(_object)
+            print('save file')
+            # return redirect(url_for('uploaded_file',
+            #                         filename=filename))
+    elif request.method == 'PUT':
+        print('put put put')
+    return jsonify(response_object)
+
+
+def allowed_file(filename):
+    return '.' in filename and \
+           filename.rsplit('.', 1)[1].lower(
+           ) in app.config['ALLOWED_EXTENSIONS']
+
+
 def get_datasets():
     with database.engine.begin() as connection:
         result = connection.execute(select(
-            [models.datasets.c.dataset_id, models.datasets.c.name, models.datasets.c.objects]).select_from(models.datasets))
-        return [dict(id=row['dataset_id'], objects=row['objects'], name=row['name']) for row in result]
+            [models.datasets.c.dataset_id, models.datasets.c.name, func.count(models.objects.c.object_id).label('object_count')])
+            .select_from(models.datasets.outerjoin(models.objects))
+            .where(models.datasets.c.active == True)
+            .group_by(models.datasets.c.dataset_id))
+        return [dict(id=row['dataset_id'], objects=row['object_count'], name=row['name']) for row in result]
 
 
 def add_dataset(dataset):
+    print('add_dataset: '+str(dataset))
     try_insert_or_update(models.datasets.insert(), [dict(
-        name=dataset['name'], dataset_id=dataset['id'], objects=dataset['objects'])], "datasets")
+        name=dataset['name'], active=True)], "datasets")
+    return
+
+
+def add_object(_object):
+    print('add_object: '+str(_object))
+    try_insert_or_update(models.objects.insert(), [dict(
+        dataset_id=_object['dataset_id'], filename=_object['filename'])], "objects")
     return
 
 
@@ -127,25 +180,4 @@ def try_insert_or_update(insert_function, data, table_name):
             connection.execute(insert_function, data)
 
 
-# datasets = [
-#     {
-#         'id': 0,
-#         'name': 'Christian',
-#                 'objects': 327
-#     },
-#     {
-#         'id': 1,
-#         'name': 'Christian',
-#                 'objects': 13
-#     },
-#     {
-#         'id': 2,
-#         'name': 'Christian',
-#                 'objects': 2156
-#     }
-# ]
-
-
-# Register api
-# app.register_blueprint(api, url_prefix='/api')
 app.register_blueprint(frontend, url_prefix='/frontend')
