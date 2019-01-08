@@ -6,7 +6,7 @@ from sqlalchemy.types import Integer, BigInteger, String, DateTime, PickleType, 
 from sqlalchemy.sql.schema import UniqueConstraint, CheckConstraint
 from sqlalchemy.dialects.postgresql import ARRAY
 from sqlalchemy.sql import func
-from leadeagle.extensions import database
+from leadeagle.server.extensions import database
 
 metadata = database.metadata
 

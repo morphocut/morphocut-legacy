@@ -6,7 +6,11 @@
         <hr>
         <br>
         <br>
-        <button type="button" class="btn btn-success btn-sm" v-b-modal.dataset-modal>Add Project</button>
+        <button
+          type="button"
+          class="btn btn-success btn-sm"
+          v-b-modal.dataset-modal
+        >Add Project</button>
         <br>
         <br>
         <table class="table table-hover">
@@ -19,7 +23,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(dataset, index) in datasets" :key="index">
+            <tr
+              v-for="dataset in datasets"
+              :key="dataset.id"
+            >
               <td>{{ dataset.id }}</td>
               <td>{{ dataset.name }}</td>
               <td>{{ dataset.objects }}</td>
@@ -30,13 +37,13 @@
                   style="margin-left: 0.5rem;"
                   v-on:click="processDataset(dataset)"
                 >Process</button>
-                <button
+                <b-button
                   type="button"
                   class="btn btn-warning btn-sm"
                   style="margin-left: 0.5rem;"
-                  v-if="dataset.download_complete"
-                  v-on:click="downloadDataset(dataset)"
-                >Download</button>
+                  v-if="dataset.download_path"
+                  :href="dataset.download_path"
+                >Download</b-button>
                 <div v-if="dataset.download_running">
                   <div class="loader"></div>
                 </div>
@@ -56,9 +63,22 @@
       <h1>Processing...</h1>
       <div class="loader"></div>
     </div>-->
-    <b-modal ref="addDatasetModal" id="dataset-modal" title="Add a new dataset" hide-footer>
-      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
+    <b-modal
+      ref="addDatasetModal"
+      id="dataset-modal"
+      title="Add a new dataset"
+      hide-footer
+    >
+      <b-form
+        @submit="onSubmit"
+        @reset="onReset"
+        class="w-100"
+      >
+        <b-form-group
+          id="form-name-group"
+          label="Name:"
+          label-for="form-name-input"
+        >
           <b-form-input
             id="form-name-input"
             type="text"
@@ -132,6 +152,7 @@ export default {
           dataset.download_complete
       );
       axios.get(path).then(res => {
+        this.$set(dataset, "download_complete", true);
         dataset.download_path = res.data.download_path;
         this.$set(dataset, "download_complete", true);
         dataset.download_running = false;

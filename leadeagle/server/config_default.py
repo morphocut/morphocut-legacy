@@ -2,7 +2,7 @@
 REDIS_URL = "redis://:@localhost:6379/0"
 
 # Database
-SQLALCHEMY_DATABASE_URI = "postgresql://morphocluster:morphocluster@localhost/morphocluster"
+SQLALCHEMY_DATABASE_URI = "postgresql://leadeagle:leadeagle@localhost/leadeagle"
 SQLALCHEMY_TRACK_MODIFICATIONS = False
 SQLALCHEMY_DATABASE_OPTIONS = {
     'connect_args': {
@@ -13,5 +13,8 @@ SQLALCHEMY_DATABASE_OPTIONS = {
 # Project export directory
 PROJECT_EXPORT_DIR = "/tmp"
 
+UPLOAD_FOLDER = "/home/mschroeder/LeadEagle/leadeagle/leadeagle/server/static"
+
 # Upload Settings
-ALLOWED_EXTENSIONS = ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+ALLOWED_EXTENSIONS = set(
+    ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])

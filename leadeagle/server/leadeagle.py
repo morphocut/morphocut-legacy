@@ -24,9 +24,10 @@ from timer_cm import Timer
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-from leadeagle import models, segmentation
-from leadeagle.extensions import database, migrate, redis_store
-from leadeagle.frontend import frontend
+from leadeagle.server import models
+from leadeagle import segmentation
+from leadeagle.server.extensions import database, migrate, redis_store
+from leadeagle.server.frontend import frontend
 # from morphocluster.api import api
 # from morphocluster.numpy_json_encoder import NumpyJSONEncoder
 # from morphocluster.tree import Tree
@@ -36,8 +37,10 @@ faulthandler.enable()
 
 app = Flask(__name__)
 
-app.config.from_object('leadeagle.config_default')
-app.config.from_envvar('LEADEAGLE_SETTINGS')
+app.config.from_object('leadeagle.server.config_default')
+
+if 'LEADEAGLE_SETTINGS' in os.environ:
+    app.config.from_envvar('LEADEAGLE_SETTINGS')
 
 # Initialize extensions
 database.init_app(app)
@@ -131,15 +134,21 @@ def process_dataset_route(id):
             if (r is not None):
                 dataset_path = r['path']
                 path = os.path.join(app.config['UPLOAD_FOLDER'], dataset_path)
-                download_path = segmentation.process(path, app.config['UPLOAD_FOLDER'])
-                response_object['download_path'] = 'static/'+download_path
+                download_path = segmentation.process(
+                    path, app.config['UPLOAD_FOLDER'])
+                response_object['download_path'] = 'static/' + download_path
     return jsonify(response_object)
+
+
+# @Christian: Use sensible resource paths!
+# Like in e.g. https://restfulapi.net/resource-naming/
+# /datasets/<id>/upload
 
 
 @app.route('/upload', methods=['GET', 'POST', 'PUT'])
 def upload():
     response_object = {'status': 'success'}
-    print('upload '+str(request.method)+'\n')
+    print('upload ' + str(request.method) + '\n')
     if request.method == 'POST':
         if 'file' not in request.files:
             flash('No file part')
@@ -217,14 +226,14 @@ def get_dataset_files(id):
 
 
 def add_dataset(dataset):
-    print('add_dataset: '+str(dataset))
+    print('add_dataset: ' + str(dataset))
     try_insert_or_update(models.datasets.insert(), [dict(
         name=dataset['name'], path=dataset['name'], active=True)], "datasets")
     return
 
 
 def add_object(_object):
-    print('add_object: '+str(_object))
+    print('add_object: ' + str(_object))
     try_insert_or_update(models.objects.insert(), [dict(
         dataset_id=_object['dataset_id'], filename=_object['filename'])], "objects")
     return

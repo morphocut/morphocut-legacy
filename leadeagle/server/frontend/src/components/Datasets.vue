@@ -6,7 +6,11 @@
         <hr>
         <br>
         <br>
-        <button type="button" class="btn btn-success btn-sm" v-b-modal.dataset-modal>Add Dataset</button>
+        <button
+          type="button"
+          class="btn btn-success btn-sm"
+          v-b-modal.dataset-modal
+        >Add Dataset</button>
         <br>
         <br>
         <table class="table table-hover">
@@ -19,23 +23,45 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="(dataset, index) in datasets" :key="index">
+            <tr
+              v-for="(dataset, index) in datasets"
+              :key="index"
+            >
               <td>{{ dataset.id }}</td>
               <td>{{ dataset.name }}</td>
               <td>{{ dataset.objects }}</td>
               <td>
-                <b-button type="button" class="btn btn-warning btn-sm" :to="{ name: 'Upload', params: { dataset: dataset }}">Edit
+                <b-button
+                  type="button"
+                  class="btn btn-warning btn-sm"
+                  :to="{ name: 'Upload', params: { dataset_id: dataset.id }}"
+                >Edit
                   <!-- <router-link :to="{ name: 'Upload', params: { dataset: 123 }}">Edit</router-link> -->
+                  <!-- @Christian: :to="{ name: 'Upload', params: { dataset_id: dataset.id }} -->
                 </b-button>
-                <button type="button" class="btn btn-danger btn-sm" style="margin-left: 0.5rem;" v-on:click="removeDataset(dataset.id)">Delete</button>
+                <button
+                  type="button"
+                  class="btn btn-danger btn-sm"
+                  style="margin-left: 0.5rem;"
+                  v-on:click="removeDataset(dataset.id)"
+                >Delete</button>
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <b-modal ref="addDatasetModal" id="dataset-modal" title="Add a new dataset" hide-footer>
-      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+    <b-modal
+      ref="addDatasetModal"
+      id="dataset-modal"
+      title="Add a new dataset"
+      hide-footer
+    >
+      <b-form
+        @submit="onSubmit"
+        @reset="onReset"
+        class="w-100"
+      >
         <!-- <b-form-group id="form-id-group" label="ID:" label-for="form-id-input">
           <b-form-input
             id="form-id-input"
@@ -45,7 +71,11 @@
             placeholder="Enter ID"
           ></b-form-input>
         </b-form-group> -->
-        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
+        <b-form-group
+          id="form-name-group"
+          label="Name:"
+          label-for="form-name-input"
+        >
           <b-form-input
             id="form-name-input"
             type="text"
@@ -63,8 +93,14 @@
             placeholder="Enter objects"
           ></b-form-input>
         </b-form-group> -->
-        <b-button type="submit" variant="primary">Submit</b-button>
-        <b-button type="reset" variant="danger">Reset</b-button>
+        <b-button
+          type="submit"
+          variant="primary"
+        >Submit</b-button>
+        <b-button
+          type="reset"
+          variant="danger"
+        >Reset</b-button>
       </b-form>
     </b-modal>
   </div>
@@ -115,7 +151,7 @@ export default {
         });
     },
     removeDataset(id) {
-      console.log("remove dataset: "+id);
+      console.log("remove dataset: " + id);
       // const path = "http://localhost:5000/datasets";
       // axios
       //   .post(path, payload)

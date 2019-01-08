@@ -15,36 +15,36 @@ import zipfile
 
 
 def get_property_column_types():
-    propDict = {'img_file_name':  '[t]',
+    propDict = {'img_file_name': '[t]',
 
-                    'object_id':  '[t]',
-                    'object_date':  '[t]',
-                    'object_time':  '[t]',
-                    'object_width':  '[f]',
-                    'object_height':  '[f]',
-                    'object_area':  '[f]',
-                    'object_major_axis_length':  '[f]',
-                    'object_minor_axis_length':  '[f]',
-                    'object_bounding_box_area': '[f]',
-                    'object_centroid_row': '[f]',
-                    'object_centroid_col': '[f]',
-                    'object_convex_area': '[f]',
-                    'object_eccentricity': '[f]',
-                    'object_equivalent_diameter': '[f]',
-                    'object_euler_number': '[f]',
-                    'object_extent': '[f]',
-                    'object_filled_area': '[f]',
-                    'object_local_centroid_row': '[f]',
-                    'object_local_centroid_col': '[f]',
-                    # 'object_max_intensity': '[f]',
-                    # 'object_mean_intensity': '[f]',
-                    # 'object_min_intensity': '[f]',
-                    'object_perimeter': '[f]',
-                    'object_solidity': '[f]',
-                    # 'object_weighted_centroid_row': '[f]',
-                    # 'object_weighted_centroid_col': '[f]',
-                    # 'object_weighted_local_centroid_row': '[f]',
-                    # 'object_weighted_local_centroid_col': '[f]',
+                'object_id': '[t]',
+                'object_date': '[t]',
+                'object_time': '[t]',
+                'object_width': '[f]',
+                'object_height': '[f]',
+                'object_area': '[f]',
+                'object_major_axis_length': '[f]',
+                'object_minor_axis_length': '[f]',
+                'object_bounding_box_area': '[f]',
+                'object_centroid_row': '[f]',
+                'object_centroid_col': '[f]',
+                'object_convex_area': '[f]',
+                'object_eccentricity': '[f]',
+                'object_equivalent_diameter': '[f]',
+                'object_euler_number': '[f]',
+                'object_extent': '[f]',
+                'object_filled_area': '[f]',
+                'object_local_centroid_row': '[f]',
+                'object_local_centroid_col': '[f]',
+                # 'object_max_intensity': '[f]',
+                # 'object_mean_intensity': '[f]',
+                # 'object_min_intensity': '[f]',
+                'object_perimeter': '[f]',
+                'object_solidity': '[f]',
+                # 'object_weighted_centroid_row': '[f]',
+                # 'object_weighted_centroid_col': '[f]',
+                # 'object_weighted_local_centroid_row': '[f]',
+                # 'object_weighted_local_centroid_col': '[f]',
                 }
     return propDict
 
@@ -56,42 +56,40 @@ def get_properties_list(original):
     Returns: the list of dictionaries
     '''
     prop_list = []
-    i = 1
 
-    for property in original['properties']:
-        propDict = {'img_file_name':  str(original['object_id']+'_'+str(i)+'.png'),
-
-                    'object_id':  str(original['object_id']+'_'+str(i)),
-                    'object_date':  str(datetime.datetime.now().strftime('%Y%m%d')),
-                    'object_time':  str(datetime.datetime.now().strftime('%H%M%S')),
-                    'object_width':  property.bbox[3] - property.bbox[1],
-                    'object_height':  property.bbox[2] - property.bbox[0],
-                    'object_area':  property.area,
-                    'object_major_axis_length':  property.major_axis_length,
-                    'object_minor_axis_length':  property.minor_axis_length,
-                    'object_bounding_box_area': property.bbox_area, 
-                    'object_centroid_row': property.centroid[0], 
-                    'object_centroid_col': property.centroid[1], 
-                    'object_convex_area': property.convex_area, 
-                    'object_eccentricity': property.eccentricity, 
-                    'object_equivalent_diameter': property.equivalent_diameter, 
-                    'object_euler_number': property.euler_number, 
-                    'object_extent': property.extent, 
-                    'object_filled_area': property.filled_area, 
-                    'object_local_centroid_row': property.local_centroid[0], 
-                    'object_local_centroid_col': property.local_centroid[1], 
-                    # 'object_max_intensity': property.max_intensity, 
-                    # 'object_mean_intensity': property.mean_intensity, 
-                    # 'object_min_intensity': property.min_intensity, 
-                    'object_perimeter': property.perimeter, 
-                    'object_solidity': property.solidity, 
-                    # 'object_weighted_centroid_row': property.weighted_centroid[0], 
-                    # 'object_weighted_centroid_col': property.weighted_centroid[1], 
-                    # 'object_weighted_local_centroid_row': property.weighted_local_centroid[0], 
-                    # 'object_weighted_local_centroid_col': property.weighted_local_centroid[1], 
-                    }
+    for i, property in enumerate(original['properties']):
+        propDict = {
+            'img_file_name': "{}_{}.png".format(original['object_id'], i),
+            'object_id': "{}_{}".format(original['object_id'], i),
+            'object_date': str(datetime.datetime.now().strftime('%Y%m%d')),
+            'object_time': str(datetime.datetime.now().strftime('%H%M%S')),
+            'object_width': property.bbox[3] - property.bbox[1],
+            'object_height': property.bbox[2] - property.bbox[0],
+            'object_area': property.area,
+            'object_major_axis_length': property.major_axis_length,
+            'object_minor_axis_length': property.minor_axis_length,
+            'object_bounding_box_area': property.bbox_area,
+            'object_centroid_row': property.centroid[0],
+            'object_centroid_col': property.centroid[1],
+            'object_convex_area': property.convex_area,
+            'object_eccentricity': property.eccentricity,
+            'object_equivalent_diameter': property.equivalent_diameter,
+            'object_euler_number': property.euler_number,
+            'object_extent': property.extent,
+            'object_filled_area': property.filled_area,
+            'object_local_centroid_row': property.local_centroid[0],
+            'object_local_centroid_col': property.local_centroid[1],
+            # 'object_max_intensity': property.max_intensity,
+            # 'object_mean_intensity': property.mean_intensity,
+            # 'object_min_intensity': property.min_intensity,
+            'object_perimeter': property.perimeter,
+            'object_solidity': property.solidity,
+            # 'object_weighted_centroid_row': property.weighted_centroid[0],
+            # 'object_weighted_centroid_col': property.weighted_centroid[1],
+            # 'object_weighted_local_centroid_row': property.weighted_local_centroid[0],
+            # 'object_weighted_local_centroid_col': property.weighted_local_centroid[1],
+        }
         prop_list.append(propDict)
-        i += 1
     return prop_list
 
 
@@ -99,23 +97,23 @@ def export_image_regions(original, zip):
     '''
     Iterates through the region properties and exports images containing each object
     '''
-    print(original['object_id']+': exporting object images!')
-    i = 0
+    print(original['object_id'] + ': exporting object images!')
+
     bar = ProgressBar(len(original['properties']), max_width=40)
-    for property in original['properties']:
+    for i, property in enumerate(original['properties']):
         # print('exporting object: '+str(i))
         x = property.bbox[0]
         y = property.bbox[1]
-        w = property.bbox[2]-property.bbox[0]
-        h = property.bbox[3]-property.bbox[1]
+        w = property.bbox[2] - property.bbox[0]
+        h = property.bbox[3] - property.bbox[1]
 
         bordersize_w = int(w / 2)
         bordersize_h = int(h / 2)
 
-        xmin = max(0, x-bordersize_w)
-        xmax = min(original['img'].shape[0], x+w+bordersize_w)
-        ymin = max(0, y-bordersize_h)
-        ymax = min(original['img'].shape[1], y+h+bordersize_h)
+        xmin = max(0, x - bordersize_w)
+        xmax = min(original['img'].shape[0], x + w + bordersize_w)
+        ymin = max(0, y - bordersize_h)
+        ymax = min(original['img'].shape[1], y + h + bordersize_h)
 
         original_masked = original['img'][xmin:xmax, ymin:ymax]
         contours_masked = original['contour_img'][xmin:xmax, ymin:ymax]
@@ -133,16 +131,15 @@ def export_image_regions(original, zip):
         # object_image = cv.copyMakeBorder(object_image, top=bordersize, bottom=bordersize, left=bordersize,
         #                     right=bordersize, borderType=cv.BORDER_CONSTANT, value=[255, 255, 255])
 
-        filename = original['object_id']+'_'+str(i)+'.png'
+        filename = "{}_{}.png".format(original['object_id'], i)
         img_str = cv.imencode('.png', original_masked)[1].tostring()
         zip.writestr(filename, img_str)
 
-        filename = original['object_id']+'_'+str(i)+'_contours.png'
+        filename = "{}_{}_contours.png".format(original['object_id'], i)
         img_str = cv.imencode('.png', contours_masked)[1].tostring()
         zip.writestr(filename, img_str)
 
-        i += 1
-        bar.numerator += 1
+        bar.numerator = i + 1
         print(bar, end="\r")
 
     print()
@@ -151,11 +148,11 @@ def export_image_regions(original, zip):
 def import_data(source_filePath):
 
     originals = []
-    
+
     folderName, fileName = os.path.split(source_filePath)
 
     if (fileName.endswith('.jpeg')):
-        print('importing '+source_filePath)
+        print('importing ' + source_filePath)
         object_id = parse("{}.{}", fileName)[0]
         img = cv.imread(source_filePath)
         originals.append(dict(object_id=object_id, img=img))
@@ -163,7 +160,7 @@ def import_data(source_filePath):
         for root, dirs, files in os.walk(source_filePath, topdown=False):
             for name in files:
                 if (name.endswith('.jpeg')):
-                    print('importing '+os.path.join(root, name))
+                    print('importing ' + os.path.join(root, name))
                     filePath = os.path.join(root, name)
                     object_id = parse("{}.{}", name)[0]
                     img = cv.imread(filePath)
@@ -227,7 +224,8 @@ def process_single_image(original):
     # cv.imshow('contour image', contour_image)
     # cv.waitKey()
 
-    print(original['object_id']+': '+str(len(properties))+' objects found!')
+    print(original['object_id'] + ': '
+          + str(len(properties)) + ' objects found!')
 
     masked = cv.bitwise_and(original['img'], original['img'], mask=mask)
 
@@ -243,9 +241,9 @@ def export_data(originals, export_path):
     #     os.makedirs(dirName)
 
     zip_relativepath = 'ecotaxa_segmentation_' + \
-        str(datetime.datetime.now().strftime('%Y_%m_%d'))+'.zip'
-    zip_filepath = os.path.join(export_path, 'ecotaxa_segmentation_' + \
-        str(datetime.datetime.now().strftime('%Y_%m_%d'))+'.zip')
+        str(datetime.datetime.now().strftime('%Y_%m_%d')) + '.zip'
+    zip_filepath = os.path.join(export_path, 'ecotaxa_segmentation_'
+                                + str(datetime.datetime.now().strftime('%Y_%m_%d'   ))+'.zip')
 
     with ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as myzip:
 
@@ -268,7 +266,7 @@ def export_data(originals, export_path):
             total_area_filled = 0
             for p in original['properties']:
                 total_area_filled += p.area
-            propDict = {'object_id':  original['object_id'],
+            propDict = {'object_id': original['object_id'],
                         'total_area': total_area,
                         'total_area_filled': total_area_filled,
                         'area_filled': (total_area_filled / total_area)}
@@ -285,7 +283,7 @@ def export_data(originals, export_path):
 
 def process(source_filepath, export_path):
     originals = import_data(source_filepath)
-    print('importing files from '+source_filepath)
+    print('importing files from ' + source_filepath)
     for original in originals:
         process_single_image(original)
     zip_filepath = export_data(originals, export_path)

@@ -1,3 +1,6 @@
-.vscode/settings.json
+.vscode/*
 *.pyc
 *.egg-info
+activate
+experiments/*.zip
+experiments/segmentation_export*
