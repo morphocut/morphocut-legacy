@@ -5,15 +5,18 @@
     <div>
       <img alt="Vue logo" src="../assets/logo.png">
     </div>
+    <div>
+      <h1>LeadEagle</h1>
+    </div>
     <div class="col col-12">
       <div class="row">
         <div class="centering">
           <b-button to="/datasets" variant="primary">Datasets</b-button>
+          <b-button to="/projects" variant="primary">Projects</b-button>
         </div>
       </div>
       <div class="row">
-        <div class="divider">
-        </div>
+        <div class="divider"></div>
       </div>
       <div class="row">
         <div class="centering">
@@ -39,7 +42,7 @@ export default {
 </script>
 
 <style>
-b-button {
+.btn {
   margin: 2px;
 }
 .row {

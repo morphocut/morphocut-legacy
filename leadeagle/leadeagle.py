@@ -24,7 +24,7 @@ from timer_cm import Timer
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-from leadeagle import models
+from leadeagle import models, segmentation
 from leadeagle.extensions import database, migrate, redis_store
 from leadeagle.frontend import frontend
 # from morphocluster.api import api
@@ -91,8 +91,16 @@ def ping_pong():
     return jsonify('pong!')
 
 
+@app.route('/datasets/<id>/files', methods=['GET'])
+def get_dataset_files_route(id):
+    response_object = {'status': 'success'}
+    if request.method == 'GET':
+        response_object['dataset_files'] = get_dataset_files(id)
+    return jsonify(response_object)
+
+
 @app.route('/datasets', methods=['GET', 'POST'])
-def all_datasets():
+def get_datasets_route():
     response_object = {'status': 'success'}
     if request.method == 'POST':
         post_data = request.get_json()
@@ -106,6 +114,25 @@ def all_datasets():
             response_object['message'] = 'Dataset added!'
     else:
         response_object['datasets'] = get_datasets()
+    return jsonify(response_object)
+
+
+@app.route('/datasets/<id>/process', methods=['GET'])
+def process_dataset_route(id):
+    response_object = {'status': 'success'}
+    if request.method == 'GET':
+        # response_object['dataset_files'] = get_dataset_files(id)
+        with database.engine.begin() as connection:
+            result = connection.execute(select(
+                [models.datasets.c.path])
+                .select_from(models.datasets)
+                .where(models.datasets.c.dataset_id == id))
+            r = result.fetchone()
+            if (r is not None):
+                dataset_path = r['path']
+                path = os.path.join(app.config['UPLOAD_FOLDER'], dataset_path)
+                download_path = segmentation.process(path, app.config['UPLOAD_FOLDER'])
+                response_object['download_path'] = 'static/'+download_path
     return jsonify(response_object)
 
 
@@ -126,10 +153,21 @@ def upload():
             flash('No selected file')
             # return redirect(request.url)
         if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            # filename = secure_filename(file.filename)
+            filename = file.filename
+            filepath = os.path.normpath(os.path.join(
+                app.config['UPLOAD_FOLDER'], dataset['path'], filename))
+
+            if not os.path.exists(os.path.dirname(filepath)):
+                try:
+                    os.makedirs(os.path.dirname(filepath))
+                except OSError as exc:  # Guard against race condition
+                    if exc.errno != errno.EEXIST:
+                        raise
+
+            file.save(filepath)
             _object = {
-                'filename': os.path.join(app.config['UPLOAD_FOLDER'], filename),
+                'filename': os.path.normpath(filename),
                 'dataset_id': dataset['id']
             }
             add_object(_object)
@@ -150,17 +188,38 @@ def allowed_file(filename):
 def get_datasets():
     with database.engine.begin() as connection:
         result = connection.execute(select(
-            [models.datasets.c.dataset_id, models.datasets.c.name, func.count(models.objects.c.object_id).label('object_count')])
+            [models.datasets.c.dataset_id, models.datasets.c.name, models.datasets.c.path, func.count(models.objects.c.object_id).label('object_count')])
             .select_from(models.datasets.outerjoin(models.objects))
             .where(models.datasets.c.active == True)
             .group_by(models.datasets.c.dataset_id))
-        return [dict(id=row['dataset_id'], objects=row['object_count'], name=row['name']) for row in result]
+        return [dict(id=row['dataset_id'], objects=row['object_count'], name=row['name'], path=row['path']) for row in result]
+
+
+def get_dataset_files(id):
+    with database.engine.begin() as connection:
+        result = connection.execute(select(
+            [models.objects.c.filename, models.objects.c.object_id, models.objects.c.modification_date, models.objects.c.creation_date])
+            .select_from(models.objects)
+            .where(models.objects.c.dataset_id == id))
+        dataset = connection.execute(select(
+            [models.datasets.c.path])
+            .select_from(models.datasets)
+            .where(models.datasets.c.dataset_id == id))
+        r = dataset.fetchone()
+        dataset_path = ''
+        if (r is not None):
+            dataset_path = r['path']
+        return [dict(filename=row['filename'],
+                     object_id=row['object_id'],
+                     modification_date=row['modification_date'],
+                     creation_date=row['creation_date'],
+                     filepath=os.path.join(dataset_path, row['filename']).replace('\\', '/')) for row in result]
 
 
 def add_dataset(dataset):
     print('add_dataset: '+str(dataset))
     try_insert_or_update(models.datasets.insert(), [dict(
-        name=dataset['name'], active=True)], "datasets")
+        name=dataset['name'], path=dataset['name'], active=True)], "datasets")
     return
 
 

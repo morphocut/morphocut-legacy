@@ -29,6 +29,47 @@
             </tr>
           </thead>
           <tbody>
+            <tr v-for="(file, index) in dataset_files" :key="file.object_id">
+              <td>{{index}}</td>
+              <td>
+                <img width="40" height="auto">
+                <!-- <span v-else>No Image</span> -->
+                <!-- <div class="filename">{{file.fileObject}}</div> -->
+              </td>
+              <td>
+                <div class="filename">{{file.filename}}</div>
+                <!-- <div class="progress" v-if="file.active || file.progress !== '0.00'">Uploaded</div> -->
+              </td>
+              <!-- <td>{{file.size | formatFileSize}}</td> -->
+              <td>FileSize</td>
+              <!-- <td>{{file.speed}}</td> -->
+              <td></td>
+
+              <td v-if="file.error">{{file.error}}</td>
+              <td v-else-if="file.success">success</td>
+              <td v-else-if="file.active">active</td>
+              <td v-else></td>
+              <td>
+                <div class="btn-group">
+                  <button class="btn btn-secondary btn-sm dropdown-toggle" type="button">Action</button>
+                  <div class="dropdown-menu">
+                    <a
+                      :class="{'dropdown-item': true, disabled: file.active || file.success || file.error === 'compressing'}"
+                      href="#"
+                      @click.prevent="file.active || file.success || file.error === 'compressing' ? false :  onEditFileShow(file)"
+                    >Edit</a>
+
+                    <div class="dropdown-divider"></div>
+                    <a
+                      class="dropdown-item"
+                      href="#"
+                      @click.prevent="$refs.upload.remove(file)"
+                    >Remove</a>
+                  </div>
+                </div>
+              </td>
+            </tr>
+
             <tr v-if="!files.length">
               <td colspan="7">
                 <div class="text-center p-5">
@@ -39,6 +80,7 @@
                 </div>
               </td>
             </tr>
+
             <tr v-for="(file, index) in orderedFiles" :key="file.id">
               <td>{{index}}</td>
               <td>
@@ -550,6 +592,7 @@ export default {
   data() {
     return {
       files: [],
+      dataset_files: [],
       accept: "image/png,image/gif,image/jpeg,image/webp",
       extensions: "gif,jpg,jpeg,png,webp",
       // extensions: ['gif', 'jpg', 'jpeg','png', 'webp'],
@@ -637,6 +680,24 @@ export default {
   },
 
   methods: {
+    getDatasetFiles() {
+      const path =
+        "http://localhost:5000/datasets/" +
+        this.$route.params.dataset.id +
+        "/files";
+      // this.alert("calling: " + path);
+      // console.log("calling: " + path);
+      axios
+        .get(path)
+        .then(res => {
+          this.dataset_files = res.data.dataset_files;
+          console.log(this.dataset_files);
+        })
+        .catch(error => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
     inputFilter(newFile, oldFile, prevent) {
       if (newFile && !oldFile) {
         // Before adding a file
@@ -874,6 +935,7 @@ export default {
     }
   },
   created() {
+    this.getDatasetFiles();
     // this.alert(
     //   "the dataset is { id: " +
     //     this.$route.params.dataset.id +

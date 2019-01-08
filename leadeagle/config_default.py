@@ -12,3 +12,6 @@ SQLALCHEMY_DATABASE_OPTIONS = {
 
 # Project export directory
 PROJECT_EXPORT_DIR = "/tmp"
+
+# Upload Settings
+ALLOWED_EXTENSIONS = ALLOWED_EXTENSIONS = set(['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])

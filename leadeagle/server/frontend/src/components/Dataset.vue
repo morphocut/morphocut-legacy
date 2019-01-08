@@ -36,7 +36,7 @@
     </div>
     <b-modal ref="addDatasetModal" id="dataset-modal" title="Add a new dataset" hide-footer>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-        <b-form-group id="form-id-group" label="ID:" label-for="form-id-input">
+        <!-- <b-form-group id="form-id-group" label="ID:" label-for="form-id-input">
           <b-form-input
             id="form-id-input"
             type="number"
@@ -44,7 +44,7 @@
             required
             placeholder="Enter ID"
           ></b-form-input>
-        </b-form-group>
+        </b-form-group> -->
         <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
           <b-form-input
             id="form-name-input"
@@ -54,7 +54,7 @@
             placeholder="Enter name"
           ></b-form-input>
         </b-form-group>
-        <b-form-group id="form-objects-group" label="Objects:" label-for="form-objects-input">
+        <!-- <b-form-group id="form-objects-group" label="Objects:" label-for="form-objects-input">
           <b-form-input
             id="form-objects-input"
             type="text"
@@ -62,7 +62,7 @@
             required
             placeholder="Enter objects"
           ></b-form-input>
-        </b-form-group>
+        </b-form-group> -->
         <b-button type="submit" variant="primary">Submit</b-button>
         <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
