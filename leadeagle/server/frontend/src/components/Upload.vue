@@ -745,7 +745,7 @@ export default {
       name: "file",
       // postAction: '/upload/post',
       // putAction: '/upload/put',
-      postAction: "http://localhost:5000/upload",
+      postAction: "/upload",
       putAction: "",
       headers: {
         "X-Csrf-Token": "xxxx"
@@ -819,10 +819,7 @@ export default {
   methods: {
     getDatasetFiles() {
       //@Christian: this.$route.params.dataset_id
-      const path =
-        "http://localhost:5000/datasets/" +
-        this.$route.params.dataset_id +
-        "/files";
+      const path = "/datasets/" + this.$route.params.dataset_id + "/files";
       // this.alert("calling: " + path);
       // console.log("calling: " + path);
       axios
@@ -907,7 +904,7 @@ export default {
     inputFile(newFile, oldFile) {
       console.log("inputfile");
 
-      const path = "http://localhost:5000/upload";
+      const path = "/upload";
       // axios.post(path, newFile)
       // .then(() => {
       //   this.getDatasets();
