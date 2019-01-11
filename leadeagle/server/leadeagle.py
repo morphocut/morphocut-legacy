@@ -14,8 +14,10 @@ from etaprogress.progress import ProgressBar
 from flask import (Flask, Response, abort, redirect, render_template, request,
                    url_for)
 import json
+import urllib.parse
 
 from flask.helpers import send_from_directory
+import sqlalchemy
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.sql.expression import bindparam
@@ -94,7 +96,7 @@ def ping_pong():
     return jsonify('pong!')
 
 
-@app.route('/datasets/<id>/files', methods=['GET'])
+@app.route('/api/datasets/<id>/files', methods=['GET'])
 def get_dataset_files_route(id):
     response_object = {'status': 'success'}
     if request.method == 'GET':
@@ -102,7 +104,7 @@ def get_dataset_files_route(id):
     return jsonify(response_object)
 
 
-@app.route('/datasets', methods=['GET', 'POST'])
+@app.route('/api/datasets', methods=['GET', 'POST'])
 def get_datasets_route():
     response_object = {'status': 'success'}
     if request.method == 'POST':
@@ -120,7 +122,7 @@ def get_datasets_route():
     return jsonify(response_object)
 
 
-@app.route('/datasets/<id>/process', methods=['GET'])
+@app.route('/api/datasets/<id>/process', methods=['GET'])
 def process_dataset_route(id):
     response_object = {'status': 'success'}
     if request.method == 'GET':
@@ -133,10 +135,19 @@ def process_dataset_route(id):
             r = result.fetchone()
             if (r is not None):
                 dataset_path = r['path']
-                path = os.path.join(app.config['UPLOAD_FOLDER'], dataset_path)
+
+                import_path = os.path.join(
+                    app.config['UPLOAD_FOLDER'], dataset_path)
+                relative_export_path = os.path.join(
+                    app.config['UPLOAD_FOLDER'], 'datasets', 'processed')
+                export_path = os.path.join(
+                    app.instance_path, relative_export_path)
                 download_path = segmentation.process(
-                    path, app.config['UPLOAD_FOLDER'])
-                response_object['download_path'] = 'static/' + download_path
+                    import_path, export_path)
+
+                response_object['download_path'] = urllib.parse.urljoin(
+                    relative_export_path, download_path)
+                response_object['download_filename'] = download_path
     return jsonify(response_object)
 
 
@@ -145,22 +156,15 @@ def process_dataset_route(id):
 # /datasets/<id>/upload
 
 
-@app.route('/upload', methods=['GET', 'POST', 'PUT'])
-def upload():
+@app.route('/api/datasets/<id>/upload', methods=['GET', 'POST', 'PUT'])
+def upload(id):
     response_object = {'status': 'success'}
     print('upload ' + str(request.method) + '\n')
     if request.method == 'POST':
         if 'file' not in request.files:
-            flash('No file part')
             return redirect(request.url)
         file = request.files['file']
-        dataset = json.loads(request.form['dataset'])
-        print(str(dataset))
-        # if user does not select file, browser also
-        # submit an empty part without filename
-        if file.filename == '':
-            flash('No selected file')
-            # return redirect(request.url)
+        dataset = get_dataset(id)
         if file and allowed_file(file.filename):
             # filename = secure_filename(file.filename)
             filename = file.filename
@@ -177,7 +181,7 @@ def upload():
             file.save(filepath)
             _object = {
                 'filename': os.path.normpath(filename),
-                'dataset_id': dataset['id']
+                'dataset_id': dataset['dataset_id']
             }
             add_object(_object)
             print('save file')
@@ -223,6 +227,18 @@ def get_dataset_files(id):
                      modification_date=row['modification_date'],
                      creation_date=row['creation_date'],
                      filepath=os.path.join(dataset_path, row['filename']).replace('\\', '/')) for row in result]
+
+
+def get_dataset(id):
+    with database.engine.begin() as connection:
+        result = connection.execute(select(
+            [sqlalchemy.text('*')])
+            .select_from(models.datasets)
+            .where(models.datasets.c.dataset_id == id))
+        row = result.fetchone()
+        if (row is not None):
+            return row.__dict__
+        return
 
 
 def add_dataset(dataset):

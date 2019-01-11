@@ -21,7 +21,7 @@ setup(
         'flask-redis',
         'Flask-Migrate',
         'timer_cm',
-        'fire', 
+        'fire',
         'Flask-Cors'
     ],
 )

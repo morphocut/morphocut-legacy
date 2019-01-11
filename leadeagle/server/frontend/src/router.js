@@ -14,41 +14,43 @@ export default new Router({
   mode: 'history',
   base: process.env.BASE_URL,
   routes: [{
-    path: '/',
-    name: 'home',
-    component: Home
-  },
-  {
-    path: '/tiles',
-    name: 'tiles',
-    // route level code-splitting
-    // this generates a separate chunk (about.[hash].js) for this route
-    // which is lazy-loaded when the route is visited.
-    component: () => import( /* webpackChunkName: "tiles" */ './views/Tiles.vue')
-  },
-  {
-    path: '/ping',
-    name: 'Ping',
-    component: Ping,
-  },
-  {
-    path: '/datasets',
-    name: 'Datasets',
-    component: Datasets,
-  },
-  {
-    //@Christian: Use sensible resource paths!
-    // Like in e.g. https://restfulapi.net/resource-naming/
-    // Don't pass objects, but identifiers!
-    path: '/datasets/:dataset_id/upload',
-    name: 'Upload',
-    component: Upload,
-    props: (route) => ({ dataset_id: parseInt(route.params.dataset_id) }),
-  },
-  {
-    path: '/projects',
-    name: 'Projects',
-    component: Projects,
-  },
+      path: '/',
+      name: 'home',
+      component: Home
+    },
+    {
+      path: '/tiles',
+      name: 'tiles',
+      // route level code-splitting
+      // this generates a separate chunk (about.[hash].js) for this route
+      // which is lazy-loaded when the route is visited.
+      component: () => import( /* webpackChunkName: "tiles" */ './views/Tiles.vue')
+    },
+    {
+      path: '/ping',
+      name: 'Ping',
+      component: Ping,
+    },
+    {
+      path: '/datasets',
+      name: 'Datasets',
+      component: Datasets,
+    },
+    {
+      //@Christian: Use sensible resource paths!
+      // Like in e.g. https://restfulapi.net/resource-naming/
+      // Don't pass objects, but identifiers!
+      path: '/datasets/:dataset_id/upload',
+      name: 'Upload',
+      component: Upload,
+      props: (route) => ({
+        dataset_id: parseInt(route.params.dataset_id)
+      }),
+    },
+    {
+      path: '/projects',
+      name: 'Projects',
+      component: Projects,
+    },
   ]
 })

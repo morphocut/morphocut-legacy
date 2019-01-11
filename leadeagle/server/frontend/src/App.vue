@@ -1,12 +1,49 @@
 <template>
   <div id="app">
+    <b-navbar toggleable="md" type="dark" variant="dark">
+      <b-navbar-toggle target="nav_collapse"></b-navbar-toggle>
+
+      <b-navbar-brand to="/">LeadEagle</b-navbar-brand>
+
+      <b-collapse is-nav id="nav_collapse">
+        <b-navbar-nav>
+          <b-nav-item to="/datasets">Datasets</b-nav-item>
+          <b-nav-item to="/projects">Projects</b-nav-item>
+          <!-- <b-nav-item href="#" disabled>Disabled</b-nav-item> -->
+        </b-navbar-nav>
+
+        <!-- Right aligned nav items -->
+        <!-- <b-navbar-nav class="ml-auto">
+          <b-nav-form>
+            <b-form-input size="sm" class="mr-sm-2" type="text" placeholder="Search"/>
+            <b-button size="sm" class="my-2 my-sm-0" type="submit">Search</b-button>
+          </b-nav-form>
+
+          <b-nav-item-dropdown text="Lang" right>
+            <b-dropdown-item href="#">EN</b-dropdown-item>
+            <b-dropdown-item href="#">ES</b-dropdown-item>
+            <b-dropdown-item href="#">RU</b-dropdown-item>
+            <b-dropdown-item href="#">FA</b-dropdown-item>
+          </b-nav-item-dropdown>
+
+          <b-nav-item-dropdown right>
+            <template slot="button-content">
+              <em>User</em>
+            </template>
+            <b-dropdown-item href="#">Profile</b-dropdown-item>
+            <b-dropdown-item href="#">Signout</b-dropdown-item>
+          </b-nav-item-dropdown>
+        </b-navbar-nav>-->
+      </b-collapse>
+    </b-navbar>
+
     <router-view/>
   </div>
 </template>
 
 <style>
 #app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  font-family: "Avenir", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-align: center;
@@ -66,7 +103,8 @@
   display: none;
   margin-bottom: 1rem;
 }
-#sidebar-nav .nav .nav-item.active .nav, #sidebar-nav .nav .active + .nav {
+#sidebar-nav .nav .nav-item.active .nav,
+#sidebar-nav .nav .active + .nav {
   display: block;
 }
 @media (min-width: 768px) {
@@ -74,23 +112,24 @@
     display: block;
   }
 }
-#sidebar-nav .nav .nav-link.active, #sidebar-nav .nav .active > .nav-link{
+#sidebar-nav .nav .nav-link.active,
+#sidebar-nav .nav .active > .nav-link {
   color: #262626;
   font-weight: 500;
 }
 #sidebar-nav .nav-item .nav-link {
-  padding: .25rem 1rem;
+  padding: 0.25rem 1rem;
   font-weight: 500;
-  color: #666
+  color: #666;
 }
 #sidebar-nav .nav-item .nav-item .nav-link {
   font-weight: 400;
   font-size: 85%;
-  margin-left: 1rem
+  margin-left: 1rem;
 }
 #main {
   padding-top: 1rem;
-  margin-bottom: 2rem
+  margin-bottom: 2rem;
 }
 blockquote {
   margin-bottom: 1rem;
@@ -116,5 +155,32 @@ pre {
 .fade.show {
   display: block;
   /* z-index: 1; */
+}
+/* Add a black background color to the top navigation */
+.topnav {
+  background-color: #333;
+  overflow: hidden;
+}
+
+/* Style the links inside the navigation bar */
+.topnav a {
+  float: left;
+  color: #f2f2f2;
+  text-align: center;
+  padding: 14px 16px;
+  text-decoration: none;
+  font-size: 17px;
+}
+
+/* Change the color of links on hover */
+.topnav a:hover {
+  background-color: #ddd;
+  color: black;
+}
+
+/* Add a color to the active/current link */
+.topnav a.active {
+  background-color: #4caf50;
+  color: white;
 }
 </style>

@@ -6,11 +6,7 @@
         <hr>
         <br>
         <br>
-        <button
-          type="button"
-          class="btn btn-success btn-sm"
-          v-b-modal.dataset-modal
-        >Add Dataset</button>
+        <button type="button" class="btn btn-success btn-sm" v-b-modal.dataset-modal>Add Dataset</button>
         <br>
         <br>
         <table class="table table-hover">
@@ -23,10 +19,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(dataset, index) in datasets"
-              :key="index"
-            >
+            <tr v-for="(dataset, index) in datasets" :key="index">
               <td>{{ dataset.id }}</td>
               <td>{{ dataset.name }}</td>
               <td>{{ dataset.objects }}</td>
@@ -51,17 +44,8 @@
         </table>
       </div>
     </div>
-    <b-modal
-      ref="addDatasetModal"
-      id="dataset-modal"
-      title="Add a new dataset"
-      hide-footer
-    >
-      <b-form
-        @submit="onSubmit"
-        @reset="onReset"
-        class="w-100"
-      >
+    <b-modal ref="addDatasetModal" id="dataset-modal" title="Add a new dataset" hide-footer>
+      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
         <!-- <b-form-group id="form-id-group" label="ID:" label-for="form-id-input">
           <b-form-input
             id="form-id-input"
@@ -70,12 +54,8 @@
             required
             placeholder="Enter ID"
           ></b-form-input>
-        </b-form-group> -->
-        <b-form-group
-          id="form-name-group"
-          label="Name:"
-          label-for="form-name-input"
-        >
+        </b-form-group>-->
+        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
           <b-form-input
             id="form-name-input"
             type="text"
@@ -92,15 +72,9 @@
             required
             placeholder="Enter objects"
           ></b-form-input>
-        </b-form-group> -->
-        <b-button
-          type="submit"
-          variant="primary"
-        >Submit</b-button>
-        <b-button
-          type="reset"
-          variant="danger"
-        >Reset</b-button>
+        </b-form-group>-->
+        <b-button type="submit" variant="primary">Submit</b-button>
+        <b-button type="reset" variant="danger">Reset</b-button>
       </b-form>
     </b-modal>
   </div>
@@ -125,7 +99,7 @@ export default {
   // },
   methods: {
     getDatasets() {
-      const path = "http://localhost:5000/datasets";
+      const path = "/api/datasets";
       axios
         .get(path)
         .then(res => {
@@ -138,7 +112,7 @@ export default {
         });
     },
     addDataset(payload) {
-      const path = "http://localhost:5000/datasets";
+      const path = "/api/datasets";
       axios
         .post(path, payload)
         .then(() => {

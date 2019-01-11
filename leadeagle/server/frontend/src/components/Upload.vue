@@ -5,29 +5,18 @@
       class="btn btn-danger float-right btn-is-option"
       @click.prevent="isOption = !isOption"
     >
-      <i
-        class="fa fa-cog"
-        aria-hidden="true"
-      ></i>
+      <i class="fa fa-cog" aria-hidden="true"></i>
       Options
     </button>
     <!-- @Christian: When the component is mounted, initialize the dataset using the given dataset_id. -->
-    <h1
-      id="example-title"
-      class="example-title"
-    >{{dataset.name}}: Upload</h1>
+    <!-- <h1 id="example-title" class="example-title">{{dataset.name}}: Upload</h1> -->
+    <h1 id="example-title" class="example-title">Dataset: Upload</h1>
 
     <!-- Drop Modal that shows up, when hovering above the page with files -->
-    <div
-      v-show="$refs.upload && $refs.upload.dropActive"
-      class="drop-active"
-    >
+    <div v-show="$refs.upload && $refs.upload.dropActive" class="drop-active">
       <h3>Hello there! Drop files to upload</h3>
     </div>
-    <div
-      class="upload"
-      v-show="!isOption"
-    >
+    <div class="upload" v-show="!isOption">
       <div class="table-responsive">
         <table class="table table-hover">
           <thead>
@@ -42,16 +31,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="(file, index) in dataset_files"
-              :key="file.object_id"
-            >
+            <tr v-for="(file, index) in dataset_files" :key="file.object_id">
               <td>{{index}}</td>
               <td>
-                <img
-                  width="40"
-                  height="auto"
-                >
+                <img width="40" height="auto">
                 <!-- <span v-else>No Image</span> -->
                 <!-- <div class="filename">{{file.fileObject}}</div> -->
               </td>
@@ -70,10 +53,7 @@
               <td v-else></td>
               <td>
                 <div class="btn-group">
-                  <button
-                    class="btn btn-secondary btn-sm dropdown-toggle"
-                    type="button"
-                  >Action</button>
+                  <button class="btn btn-secondary btn-sm dropdown-toggle" type="button">Action</button>
                   <div class="dropdown-menu">
                     <a
                       :class="{'dropdown-item': true, disabled: file.active || file.success || file.error === 'compressing'}"
@@ -98,35 +78,21 @@
                   <h4>Drop files anywhere to upload
                     <br>or
                   </h4>
-                  <label
-                    :for="name"
-                    class="btn btn-lg btn-primary"
-                  >Select Files</label>
+                  <label :for="name" class="btn btn-lg btn-primary">Select Files</label>
                 </div>
               </td>
             </tr>
 
-            <tr
-              v-for="(file, index) in orderedFiles"
-              :key="file.id"
-            >
+            <tr v-for="(file, index) in files" :key="file.id">
               <td>{{index}}</td>
               <td>
-                <img
-                  v-if="file.thumb"
-                  :src="file.thumb"
-                  width="40"
-                  height="auto"
-                >
+                <img v-if="file.thumb" :src="file.thumb" width="40" height="auto">
                 <span v-else>No Image</span>
                 <!-- <div class="filename">{{file.fileObject}}</div> -->
               </td>
               <td>
                 <div class="filename">{{file.name}}</div>
-                <div
-                  class="progress"
-                  v-if="file.active || file.progress !== '0.00'"
-                >
+                <div class="progress" v-if="file.active || file.progress !== '0.00'">
                   <div
                     :class="{'progress-bar': true, 'progress-bar-striped': true, 'bg-danger': file.error, 'progress-bar-animated': file.active}"
                     role="progressbar"
@@ -144,10 +110,7 @@
               <td v-else></td>
               <td>
                 <div class="btn-group">
-                  <button
-                    class="btn btn-secondary btn-sm dropdown-toggle"
-                    type="button"
-                  >Action</button>
+                  <button class="btn btn-secondary btn-sm dropdown-toggle" type="button">Action</button>
                   <div class="dropdown-menu">
                     <a
                       :class="{'dropdown-item': true, disabled: file.active || file.success || file.error === 'compressing'}"
@@ -159,7 +122,7 @@
                       href="#"
                       @click.prevent="file.active ? $refs.upload.update(file, {error: 'cancel'}) : false"
                     >Cancel</a>
-
+                    
                     <a
                       class="dropdown-item"
                       href="#"
@@ -224,20 +187,9 @@
             Select
           </file-upload>
           <div class="dropdown-menu">
-            <label
-              class="dropdown-item"
-              :for="name"
-            >Add files</label>
-            <a
-              class="dropdown-item"
-              href="#"
-              @click="onAddFolader"
-            >Add folder</a>
-            <a
-              class="dropdown-item"
-              href="#"
-              @click.prevent="addData.show = true"
-            >Add data</a>
+            <label class="dropdown-item" :for="name">Add files</label>
+            <a class="dropdown-item" href="#" @click="onAddFolader">Add folder</a>
+            <a class="dropdown-item" href="#" @click.prevent="addData.show = true">Add data</a>
           </div>
         </div>
         <button
@@ -246,10 +198,7 @@
           v-if="!$refs.upload || !$refs.upload.active"
           @click.prevent="$refs.upload.active = true"
         >
-          <i
-            class="fa fa-arrow-up"
-            aria-hidden="true"
-          ></i>
+          <i class="fa fa-arrow-up" aria-hidden="true"></i>
           Start Upload
         </button>
         <button
@@ -258,37 +207,21 @@
           v-else
           @click.prevent="$refs.upload.active = false"
         >
-          <i
-            class="fa fa-stop"
-            aria-hidden="true"
-          ></i>
+          <i class="fa fa-stop" aria-hidden="true"></i>
           Stop Upload
         </button>
       </div>
     </div>
 
-    <div
-      class="option"
-      v-show="isOption"
-    >
+    <div class="option" v-show="isOption">
       <div class="form-group">
         <label for="accept">Accept:</label>
-        <input
-          type="text"
-          id="accept"
-          class="form-control"
-          v-model="accept"
-        >
+        <input type="text" id="accept" class="form-control" v-model="accept">
         <small class="form-text text-muted">Allow upload mime type</small>
       </div>
       <div class="form-group">
         <label for="extensions">Extensions:</label>
-        <input
-          type="text"
-          id="extensions"
-          class="form-control"
-          v-model="extensions"
-        >
+        <input type="text" id="extensions" class="form-control" v-model="extensions">
         <small class="form-text text-muted">Allow upload file extension</small>
       </div>
       <div class="form-group">
@@ -329,27 +262,17 @@
           class="form-control"
           v-model.number="thread"
         >
-        <small class="form-text text-muted">Also upload the number of files at the same time (number of threads)</small>
+        <small
+          class="form-text text-muted"
+        >Also upload the number of files at the same time (number of threads)</small>
       </div>
       <div class="form-group">
         <label for="size">Max size:</label>
-        <input
-          type="number"
-          min="0"
-          id="size"
-          class="form-control"
-          v-model.number="size"
-        >
+        <input type="number" min="0" id="size" class="form-control" v-model.number="size">
       </div>
       <div class="form-group">
         <label for="minSize">Min size:</label>
-        <input
-          type="number"
-          min="0"
-          id="minSize"
-          class="form-control"
-          v-model.number="minSize"
-        >
+        <input type="number" min="0" id="minSize" class="form-control" v-model.number="minSize">
       </div>
       <div class="form-group">
         <label for="autoCompress">Automatically compress:</label>
@@ -364,21 +287,13 @@
           class="form-text text-muted"
           v-if="autoCompress > 0"
         >More than {{autoCompress}} files are automatically compressed</small>
-        <small
-          class="form-text text-muted"
-          v-else
-        >Set up automatic compression</small>
+        <small class="form-text text-muted" v-else>Set up automatic compression</small>
       </div>
 
       <div class="form-group">
         <div class="form-check">
           <label class="form-check-label">
-            <input
-              type="checkbox"
-              id="add-index"
-              class="form-check-input"
-              v-model="addIndex"
-            > Start position to add
+            <input type="checkbox" id="add-index" class="form-check-input" v-model="addIndex"> Start position to add
           </label>
         </div>
         <small class="form-text text-muted">Add a file list to start the location to add</small>
@@ -387,12 +302,7 @@
       <div class="form-group">
         <div class="form-check">
           <label class="form-check-label">
-            <input
-              type="checkbox"
-              id="drop"
-              class="form-check-input"
-              v-model="drop"
-            > Drop
+            <input type="checkbox" id="drop" class="form-check-input" v-model="drop"> Drop
           </label>
         </div>
         <small class="form-text text-muted">Drag and drop upload</small>
@@ -413,12 +323,7 @@
       <div class="form-group">
         <div class="form-check">
           <label class="form-check-label">
-            <input
-              type="checkbox"
-              id="upload-auto"
-              class="form-check-input"
-              v-model="uploadAuto"
-            > Auto start
+            <input type="checkbox" id="upload-auto" class="form-check-input" v-model="uploadAuto"> Auto start
           </label>
         </div>
         <small class="form-text text-muted">Automatically activate upload</small>
@@ -439,18 +344,11 @@
       tabindex="-1"
       role="dialog"
     >
-      <div
-        class="modal-dialog"
-        role="document"
-      >
+      <div class="modal-dialog" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Add data</h5>
-            <button
-              type="button"
-              class="close"
-              @click.prevent="addData.show = false"
-            >
+            <button type="button" class="close" @click.prevent="addData.show = false">
               <span>&times;</span>
             </button>
           </div>
@@ -504,10 +402,7 @@
                 class="btn btn-secondary"
                 @click.prevent="addData.show = false"
               >Close</button>
-              <button
-                type="submit"
-                class="btn btn-primary"
-              >Save</button>
+              <button type="submit" class="btn btn-primary">Save</button>
             </div>
           </form>
         </div>
@@ -521,18 +416,11 @@
       tabindex="-1"
       role="dialog"
     >
-      <div
-        class="modal-dialog modal-lg"
-        role="document"
-      >
+      <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Edit file</h5>
-            <button
-              type="button"
-              class="close"
-              @click.prevent="editFile.show = false"
-            >
+            <button type="button" class="close" @click.prevent="editFile.show = false">
               <span>&times;</span>
             </button>
           </div>
@@ -555,27 +443,18 @@
               >
                 <label>Image:</label>
                 <div class="edit-image">
-                  <img
-                    :src="editFile.blob"
-                    ref="editImage"
-                  >
+                  <img :src="editFile.blob" ref="editImage">
                 </div>
 
                 <div class="edit-image-tool">
-                  <div
-                    class="btn-group"
-                    role="group"
-                  >
+                  <div class="btn-group" role="group">
                     <button
                       type="button"
                       class="btn btn-primary"
                       @click="editFile.cropper.rotate(-90)"
                       title="cropper.rotate(-90)"
                     >
-                      <i
-                        class="fa fa-undo"
-                        aria-hidden="true"
-                      ></i>
+                      <i class="fa fa-undo" aria-hidden="true"></i>
                     </button>
                     <button
                       type="button"
@@ -583,26 +462,17 @@
                       @click="editFile.cropper.rotate(90)"
                       title="cropper.rotate(90)"
                     >
-                      <i
-                        class="fa fa-repeat"
-                        aria-hidden="true"
-                      ></i>
+                      <i class="fa fa-repeat" aria-hidden="true"></i>
                     </button>
                   </div>
-                  <div
-                    class="btn-group"
-                    role="group"
-                  >
+                  <div class="btn-group" role="group">
                     <button
                       type="button"
                       class="btn btn-primary"
                       @click="editFile.cropper.crop()"
                       title="cropper.crop()"
                     >
-                      <i
-                        class="fa fa-check"
-                        aria-hidden="true"
-                      ></i>
+                      <i class="fa fa-check" aria-hidden="true"></i>
                     </button>
                     <button
                       type="button"
@@ -610,10 +480,7 @@
                       @click="editFile.cropper.clear()"
                       title="cropper.clear()"
                     >
-                      <i
-                        class="fa fa-remove"
-                        aria-hidden="true"
-                      ></i>
+                      <i class="fa fa-remove" aria-hidden="true"></i>
                     </button>
                   </div>
                 </div>
@@ -625,10 +492,7 @@
                 class="btn btn-secondary"
                 @click.prevent="editFile.show = false"
               >Close</button>
-              <button
-                type="submit"
-                class="btn btn-primary"
-              >Save</button>
+              <button type="submit" class="btn btn-primary">Save</button>
             </div>
           </form>
         </div>
@@ -637,7 +501,9 @@
 
     <div class="pt-5">
       Source code:
-      <a href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Full.vue">/docs/views/examples/Full.vue</a>
+      <a
+        href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Full.vue"
+      >/docs/views/examples/Full.vue</a>
     </div>
   </div>
 </template>
@@ -743,16 +609,14 @@ export default {
       addIndex: false,
       thread: 3,
       name: "file",
-      // postAction: '/upload/post',
-      // putAction: '/upload/put',
       postAction: "/upload",
       putAction: "",
       headers: {
         "X-Csrf-Token": "xxxx"
       },
       data: {
-        _csrf_token: "xxxxxx",
-        dataset_id: JSON.stringify(this.dataset.id)
+        _csrf_token: "xxxxxx"
+        // dataset_id: JSON.stringify(this.dataset.id)
       },
 
       autoCompress: 1024 * 1024,
@@ -771,15 +635,6 @@ export default {
         name: ""
       }
     };
-  },
-
-  computed: {
-    orderedFiles: function() {
-      console.log("sort this array");
-      return this.files.sort(function(first, second) {
-        return second.name - first.name;
-      });
-    }
   },
 
   watch: {
@@ -819,7 +674,8 @@ export default {
   methods: {
     getDatasetFiles() {
       //@Christian: this.$route.params.dataset_id
-      const path = "/datasets/" + this.$route.params.dataset_id + "/files";
+      const path = "/api/datasets/" + this.$route.params.dataset_id + "/files";
+      // const path = "/api";
       // this.alert("calling: " + path);
       // console.log("calling: " + path);
       axios
@@ -904,7 +760,7 @@ export default {
     inputFile(newFile, oldFile) {
       console.log("inputfile");
 
-      const path = "/upload";
+      // const path = "/upload";
       // axios.post(path, newFile)
       // .then(() => {
       //   this.getDatasets();
@@ -1071,7 +927,6 @@ export default {
   },
   created() {
     // @Christian: Load this.dataset using the dataset_id given in the route.
-
     this.getDatasetFiles();
     // this.alert(
     //   "the dataset is { id: " +
