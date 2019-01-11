@@ -6,7 +6,11 @@
         <hr>
         <br>
         <br>
-        <button type="button" class="btn btn-success btn-sm" v-b-modal.dataset-modal>Add Project</button>
+        <button
+          type="button"
+          class="btn btn-success btn-sm"
+          v-b-modal.dataset-modal
+        >Add Project</button>
         <br>
         <br>
         <table class="table table-hover">
@@ -19,7 +23,10 @@
             </tr>
           </thead>
           <tbody>
-            <tr v-for="dataset in datasets" :key="dataset.id">
+            <tr
+              v-for="dataset in datasets"
+              :key="dataset.id"
+            >
               <td>{{ dataset.id }}</td>
               <td>{{ dataset.name }}</td>
               <td>{{ dataset.objects }}</td>
@@ -56,9 +63,22 @@
       <h1>Processing...</h1>
       <div class="loader"></div>
     </div>-->
-    <b-modal ref="addDatasetModal" id="dataset-modal" title="Add a new dataset" hide-footer>
-      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
-        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
+    <b-modal
+      ref="addDatasetModal"
+      id="dataset-modal"
+      title="Add a new dataset"
+      hide-footer
+    >
+      <b-form
+        @submit="onSubmit"
+        @reset="onReset"
+        class="w-100"
+      >
+        <b-form-group
+          id="form-name-group"
+          label="Name:"
+          label-for="form-name-input"
+        >
           <b-form-input
             id="form-name-input"
             type="text"
@@ -121,8 +141,7 @@ export default {
         });
     },
     processDataset(dataset) {
-      const path = "/api/datasets" + this.$route.params.dataset_id + "/process";
-      // const path = "http://localhost:5000/datasets/" + dataset.id + "/process";
+      const path = "/api/datasets/" + dataset.id + "/process";
       this.$set(dataset, "download_complete", false);
       //   dataset.download_complete = false;
       dataset.download_running = true;
