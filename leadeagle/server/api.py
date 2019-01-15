@@ -36,17 +36,6 @@ from leadeagle.server.frontend import frontend
 api = Blueprint("api", __name__)
 
 
-@api.route("/")
-def index():
-    print('index request')
-    return redirect(url_for("frontend.index"))
-
-
-@api.route('/ping', methods=['GET'])
-def ping_pong():
-    return jsonify('pong!')
-
-
 @api.route('/datasets/<id>/files', methods=['GET'])
 def get_dataset_files_route(id):
     response_object = {'status': 'success'}
