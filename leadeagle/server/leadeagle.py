@@ -30,9 +30,7 @@ from leadeagle.server import models
 from leadeagle import segmentation
 from leadeagle.server.extensions import database, migrate, redis_store
 from leadeagle.server.frontend import frontend
-# from morphocluster.api import api
-# from morphocluster.numpy_json_encoder import NumpyJSONEncoder
-# from morphocluster.tree import Tree
+from leadeagle.server.api import api
 
 # Enable fault handler for meaningful stack traces when a worker is killed
 faulthandler.enable()
@@ -50,8 +48,6 @@ redis_store.init_app(app)
 migrate.init_app(app, database)
 CORS(app)
 
-
-# app.json_encoder = NumpyJSONEncoder
 
 # Enable batch mode
 with app.app_context():
@@ -85,183 +81,45 @@ def hello_cmd():
     print("hello")
 
 
-@app.route("/")
-def index():
-    print('index request')
-    return redirect(url_for("frontend.index"))
+# Register API and frontend
+app.register_blueprint(frontend, url_prefix='/frontend')
+app.register_blueprint(api, url_prefix='/api')
 
 
-@app.route('/ping', methods=['GET'])
-def ping_pong():
-    return jsonify('pong!')
+# ===============================================================================
+# Authentication
+# ===============================================================================
+def check_auth(username, password):
+    # Retrieve entry from the database
+    with database.engine.connect() as conn:
+        stmt = models.users.select(
+            models.users.c.username == username).limit(1)
+        user = conn.execute(stmt).first()
+
+        if user is None:
+            return False
+
+    return check_password_hash(user["pwhash"], password)
 
 
-@app.route('/api/datasets/<id>/files', methods=['GET'])
-def get_dataset_files_route(id):
-    response_object = {'status': 'success'}
-    if request.method == 'GET':
-        response_object['dataset_files'] = get_dataset_files(id)
-    return jsonify(response_object)
-
-
-@app.route('/api/datasets', methods=['GET', 'POST'])
-def get_datasets_route():
-    response_object = {'status': 'success'}
-    if request.method == 'POST':
-        post_data = request.get_json()
-        if post_data is not None:
-            # datasets.append({
-            #     'id': post_data.get('id'),
-            #     'name': post_data.get('name'),
-            #     'objects': post_data.get('objects')
-            # })
-            add_dataset(post_data)
-            response_object['message'] = 'Dataset added!'
-    else:
-        response_object['datasets'] = get_datasets()
-    return jsonify(response_object)
-
-
-@app.route('/api/datasets/<id>/process', methods=['GET'])
-def process_dataset_route(id):
-    response_object = {'status': 'success'}
-    if request.method == 'GET':
-        # response_object['dataset_files'] = get_dataset_files(id)
-        with database.engine.begin() as connection:
-            result = connection.execute(select(
-                [models.datasets.c.path])
-                .select_from(models.datasets)
-                .where(models.datasets.c.dataset_id == id))
-            r = result.fetchone()
-            if (r is not None):
-                dataset_path = r['path']
-
-                import_path = os.path.join(
-                    app.config['UPLOAD_FOLDER'], dataset_path)
-                relative_export_path = os.path.join(
-                    app.config['UPLOAD_FOLDER'], 'datasets', 'processed')
-                export_path = os.path.join(
-                    app.instance_path, relative_export_path)
-                download_path = segmentation.process(
-                    import_path, export_path)
-
-                response_object['download_path'] = urllib.parse.urljoin(
-                    relative_export_path, download_path)
-                response_object['download_filename'] = download_path
-    return jsonify(response_object)
-
-
-# @Christian: Use sensible resource paths!
-# Like in e.g. https://restfulapi.net/resource-naming/
-# /datasets/<id>/upload
-
-
-@app.route('/api/datasets/<id>/upload', methods=['GET', 'POST', 'PUT'])
-def upload(id):
-    response_object = {'status': 'success'}
-    print('upload ' + str(request.method) + '\n')
-    if request.method == 'POST':
-        if 'file' not in request.files:
-            return redirect(request.url)
-        file = request.files['file']
-        dataset = get_dataset(id)
-        if file and allowed_file(file.filename):
-            # filename = secure_filename(file.filename)
-            filename = file.filename
-            filepath = os.path.normpath(os.path.join(
-                app.config['UPLOAD_FOLDER'], dataset['path'], filename))
-
-            if not os.path.exists(os.path.dirname(filepath)):
-                try:
-                    os.makedirs(os.path.dirname(filepath))
-                except OSError as exc:  # Guard against race condition
-                    if exc.errno != errno.EEXIST:
-                        raise
-
-            file.save(filepath)
-            _object = {
-                'filename': os.path.normpath(filename),
-                'dataset_id': dataset['dataset_id']
-            }
-            add_object(_object)
-            print('save file')
-            # return redirect(url_for('uploaded_file',
-            #                         filename=filename))
-    elif request.method == 'PUT':
-        print('put put put')
-    return jsonify(response_object)
-
-
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower(
-           ) in app.config['ALLOWED_EXTENSIONS']
-
-
-def get_datasets():
-    with database.engine.begin() as connection:
-        result = connection.execute(select(
-            [models.datasets.c.dataset_id, models.datasets.c.name, models.datasets.c.path, func.count(models.objects.c.object_id).label('object_count')])
-            .select_from(models.datasets.outerjoin(models.objects))
-            .where(models.datasets.c.active == True)
-            .group_by(models.datasets.c.dataset_id))
-        return [dict(id=row['dataset_id'], objects=row['object_count'], name=row['name'], path=row['path']) for row in result]
-
-
-def get_dataset_files(id):
-    with database.engine.begin() as connection:
-        result = connection.execute(select(
-            [models.objects.c.filename, models.objects.c.object_id, models.objects.c.modification_date, models.objects.c.creation_date])
-            .select_from(models.objects)
-            .where(models.objects.c.dataset_id == id))
-        dataset = connection.execute(select(
-            [models.datasets.c.path])
-            .select_from(models.datasets)
-            .where(models.datasets.c.dataset_id == id))
-        r = dataset.fetchone()
-        dataset_path = ''
-        if (r is not None):
-            dataset_path = r['path']
-        return [dict(filename=row['filename'],
-                     object_id=row['object_id'],
-                     modification_date=row['modification_date'],
-                     creation_date=row['creation_date'],
-                     filepath=os.path.join(dataset_path, row['filename']).replace('\\', '/')) for row in result]
-
-
-def get_dataset(id):
-    with database.engine.begin() as connection:
-        result = connection.execute(select(
-            [sqlalchemy.text('*')])
-            .select_from(models.datasets)
-            .where(models.datasets.c.dataset_id == id))
-        row = result.fetchone()
-        if (row is not None):
-            return row.__dict__
+# @app.before_request
+def require_auth():
+    # exclude 404 errors and static routes
+    # uses split to handle blueprint static routes as well
+    if not request.endpoint or request.endpoint.rsplit('.', 1)[-1] == 'static':
         return
 
+    auth = request.authorization
 
-def add_dataset(dataset):
-    print('add_dataset: ' + str(dataset))
-    try_insert_or_update(models.datasets.insert(), [dict(
-        name=dataset['name'], path=dataset['name'], active=True)], "datasets")
-    return
+    success = check_auth(auth.username, auth.password) if auth else None
 
+    if not auth or not success:
+        if success is False:
+            # Rate limiting for failed passwords
+            sleep(1)
 
-def add_object(_object):
-    print('add_object: ' + str(_object))
-    try_insert_or_update(models.objects.insert(), [dict(
-        dataset_id=_object['dataset_id'], filename=_object['filename'])], "objects")
-    return
-
-
-def try_insert_or_update(insert_function, data, table_name):
-    """
-    Try to insert a data list into the database
-    """
-    with database.engine.begin() as connection:
-        if len(data) > 0:
-            connection.execute(insert_function, data)
-
-
-app.register_blueprint(frontend, url_prefix='/frontend')
+        # Send a 401 response that enables basic auth
+        return Response(
+            'Could not verify your access level.\n'
+            'You have to login with proper credentials', 401,
+            {'WWW-Authenticate': 'Basic realm="Login Required"'})

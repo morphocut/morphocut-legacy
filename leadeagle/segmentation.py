@@ -15,6 +15,9 @@ import zipfile
 
 
 def get_property_column_types():
+    '''
+    Returns the column types for the columns in the tsv file for the ecotaxa export
+    '''
     propDict = {'img_file_name': '[t]',
 
                 'object_id': '[t]',
@@ -101,20 +104,24 @@ def export_image_regions(original, zip):
 
     bar = ProgressBar(len(original['properties']), max_width=40)
     for i, property in enumerate(original['properties']):
-        # print('exporting object: '+str(i))
+        
+        # Define bounding box and position of the object
         x = property.bbox[0]
         y = property.bbox[1]
         w = property.bbox[2] - property.bbox[0]
         h = property.bbox[3] - property.bbox[1]
 
+        # Define bordersize based on the width and height of the object. The border size specifies how much of the image around the object is shown in its image.
         bordersize_w = int(w / 2)
         bordersize_h = int(h / 2)
 
+        # Calculate min and max values for the border around the object, so that there are no array errors (no value below 0, no value above max width/height).
         xmin = max(0, x - bordersize_w)
         xmax = min(original['img'].shape[0], x + w + bordersize_w)
         ymin = max(0, y - bordersize_h)
         ymax = min(original['img'].shape[1], y + h + bordersize_h)
 
+        # Create the masked and the masked contour image of the object
         original_masked = original['img'][xmin:xmax, ymin:ymax]
         contours_masked = original['contour_img'][xmin:xmax, ymin:ymax]
 
@@ -131,6 +138,7 @@ def export_image_regions(original, zip):
         # object_image = cv.copyMakeBorder(object_image, top=bordersize, bottom=bordersize, left=bordersize,
         #                     right=bordersize, borderType=cv.BORDER_CONSTANT, value=[255, 255, 255])
 
+        # Save the created images to the zipfile
         filename = "{}_{}.png".format(original['object_id'], i)
         img_str = cv.imencode('.png', original_masked)[1].tostring()
         zip.writestr(filename, img_str)
@@ -146,16 +154,22 @@ def export_image_regions(original, zip):
 
 
 def import_data(source_filePath):
+    '''
+    Imports the data from the path specified in source_filePath
+    '''
 
     originals = []
 
+    # If source_filePath points to a file, separate its filename from the path
     folderName, fileName = os.path.split(source_filePath)
 
+    # If it is an image file, load it
     if (fileName.endswith('.jpeg')):
         print('importing ' + source_filePath)
         object_id = parse("{}.{}", fileName)[0]
         img = cv.imread(source_filePath)
         originals.append(dict(object_id=object_id, img=img))
+    # If it is not an image file, load the image files in the folder
     else:
         for root, dirs, files in os.walk(source_filePath, topdown=False):
             for name in files:
@@ -196,97 +210,118 @@ def process_single_image(original):
 
     src = original['img']
 
-    src = flatten_colors(src)
-
+    # Convert the image into grayscale colorspace
     src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
 
-    # _ ,mask = cv.threshold(src, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
-    # mask = cv.bitwise_not(mask)
-
-    _, mask = cv.threshold(src, 90, 255, cv.THRESH_BINARY)
+    # Segment foreground objects from background objects using thresholding with the otsu method
+    _ ,mask = cv.threshold(src, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
     mask = cv.bitwise_not(mask)
 
+    # Alternative to otsu method, using adaptive thresholding
     # mask = cv.adaptiveThreshold(src,255,cv.ADAPTIVE_THRESH_GAUSSIAN_C,cv.THRESH_BINARY_INV,55,3)
     # kernel = np.ones((5,5), np.uint8)
     # mask = cv.dilate(mask, kernel, iterations=1)
 
+    # Find connected components in the masked image to identify individual objects
     _, markers = cv.connectedComponents(mask)
 
-    # retrieve regionprops of the connected components and filter those who are smaller than 15 pixels in area
-    areaThreshold = 15
+    # Retrieve regionprops of the connected components and filter out those who are smaller than 30 pixels in area
+    areaThreshold = 30
     properties = measure.regionprops(markers, coordinates='rc')
     properties = [p for p in properties if p.area > areaThreshold]
 
+    # Create an image with the contours of all the objects marked
     c_img, contours, hierarchy = cv.findContours(mask, 1, 2)
     contour_image = original['img'].copy()
     cv.drawContours(contour_image, contours, -1, (0, 255, 0), 1)
 
-    # cv.imshow('contour image', contour_image)
-    # cv.waitKey()
-
     print(original['object_id'] + ': '
           + str(len(properties)) + ' objects found!')
 
-    masked = cv.bitwise_and(original['img'], original['img'], mask=mask)
+    # masked = cv.bitwise_and(original['img'], original['img'], mask=mask)
 
+    # Save the calculated properties and images to a dictionary
     original['mask'] = mask
     original['properties'] = properties
     original['contour_img'] = contour_image
 
 
+def correct_vignette(img):
+    return img
+
+
 def export_data(originals, export_path):
 
-    # dirName = 'segmentation_export'
-    # if not os.path.exists(dirName):
-    #     os.makedirs(dirName)
+    # print('export_path: '+export_path)
 
-    zip_relativepath = 'ecotaxa_segmentation_' + \
+    # Define the filename and full path for the zip file
+    zip_filename = 'ecotaxa_segmentation_' + \
         str(datetime.datetime.now().strftime('%Y_%m_%d')) + '.zip'
-    zip_filepath = os.path.join(export_path, 'ecotaxa_segmentation_'
-                                + str(datetime.datetime.now().strftime('%Y_%m_%d'   ))+'.zip')
+    zip_filepath = os.path.join(export_path, zip_filename)
 
+    # If the path does not exist, create it
+    if not os.path.exists(export_path):
+        os.makedirs(export_path)
+
+    # Create the zip file
     with ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as myzip:
-
+        
         prop_list = []
         prop_list.insert(0, get_property_column_types())
         for original in originals:
+            # Collect the information on the object into a list of dictionaries
             prop_list_single = get_properties_list(original)
             prop_list.extend(prop_list_single)
+            # Calculate the masked images for the object and write them to the zip file
             export_image_regions(original, myzip)
+
+        # Transform the list into a dataframe
         prop_frame = pd.DataFrame(prop_list)
 
+        # Write the dataframe as a tsv file to the zip file
         sio = StringIO()
         filepath = 'ecotaxa_segmentation.tsv'
         prop_frame.to_csv(sio, sep='\t', encoding='utf-8', index=False)
         myzip.writestr(filepath, sio.getvalue())
 
-        general_properties = []
-        for original in originals:
-            total_area = original['img'].shape[0] * original['img'].shape[1]
-            total_area_filled = 0
-            for p in original['properties']:
-                total_area_filled += p.area
-            propDict = {'object_id': original['object_id'],
-                        'total_area': total_area,
-                        'total_area_filled': total_area_filled,
-                        'area_filled': (total_area_filled / total_area)}
-            general_properties.append(propDict)
-        prop_frame = pd.DataFrame(general_properties)
+        # Create a second tsv file containing general information about the processed images
+        # general_properties = []
+        # for original in originals:
+        #     total_area = original['img'].shape[0] * original['img'].shape[1]
+        #     total_area_filled = 0
+        #     for p in original['properties']:
+        #         total_area_filled += p.area
+        #     propDict = {'object_id': original['object_id'],
+        #                 'total_area': total_area,
+        #                 'total_area_filled': total_area_filled,
+        #                 'area_filled': (total_area_filled / total_area)}
+        #     general_properties.append(propDict)
+        # prop_frame = pd.DataFrame(general_properties)
 
-        sio = StringIO()
-        filepath = 'ecotaxa_general.tsv'
-        prop_frame.to_csv(sio, sep='\t', encoding='utf-8', index=False)
-        myzip.writestr(filepath, sio.getvalue())
+        # sio = StringIO()
+        # filepath = 'ecotaxa_general.tsv'
+        # prop_frame.to_csv(sio, sep='\t', encoding='utf-8', index=False)
+        # myzip.writestr(filepath, sio.getvalue())
 
-    return zip_relativepath
+    return zip_filename
 
 
 def process(source_filepath, export_path):
+    '''
+    Imports images from the path specified in source_filepath and then performs segmentation on the images.
+    The new image data and statistics are exported to a zip-file at the path specified in export_path.
+    '''
+    # Import the data from source_filepath
     originals = import_data(source_filepath)
     print('importing files from ' + source_filepath)
+
+    # Process the data
     for original in originals:
         process_single_image(original)
+
+    # Export the data
     zip_filepath = export_data(originals, export_path)
+
     return zip_filepath
 
 

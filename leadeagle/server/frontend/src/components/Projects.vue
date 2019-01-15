@@ -6,11 +6,7 @@
         <hr>
         <br>
         <br>
-        <button
-          type="button"
-          class="btn btn-success btn-sm"
-          v-b-modal.dataset-modal
-        >Add Project</button>
+        <button type="button" class="btn btn-success btn-sm" v-b-modal.dataset-modal>Add Project</button>
         <br>
         <br>
         <table class="table table-hover">
@@ -23,10 +19,7 @@
             </tr>
           </thead>
           <tbody>
-            <tr
-              v-for="dataset in datasets"
-              :key="dataset.id"
-            >
+            <tr v-for="dataset in datasets" :key="dataset.id">
               <td>{{ dataset.id }}</td>
               <td>{{ dataset.name }}</td>
               <td>{{ dataset.objects }}</td>
@@ -63,22 +56,9 @@
       <h1>Processing...</h1>
       <div class="loader"></div>
     </div>-->
-    <b-modal
-      ref="addDatasetModal"
-      id="dataset-modal"
-      title="Add a new dataset"
-      hide-footer
-    >
-      <b-form
-        @submit="onSubmit"
-        @reset="onReset"
-        class="w-100"
-      >
-        <b-form-group
-          id="form-name-group"
-          label="Name:"
-          label-for="form-name-input"
-        >
+    <b-modal ref="addDatasetModal" id="dataset-modal" title="Add a new dataset" hide-footer>
+      <b-form @submit="onSubmit" @reset="onReset" class="w-100">
+        <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">
           <b-form-input
             id="form-name-input"
             type="text"
@@ -143,20 +123,13 @@ export default {
     processDataset(dataset) {
       const path = "/api/datasets/" + dataset.id + "/process";
       this.$set(dataset, "download_complete", false);
-      //   dataset.download_complete = false;
-      dataset.download_running = true;
-      console.log(
-        "download_running: " +
-          dataset.download_running +
-          ", " +
-          dataset.download_complete
-      );
+      this.$set(dataset, "download_running", true);
       axios.get(path).then(res => {
         this.$set(dataset, "download_complete", true);
-        dataset.download_path = res.data.download_path;
-        this.$set(dataset, "download_complete", true);
-        dataset.download_running = false;
-        axios.get("http://localhost:5000/" + dataset.download_path);
+        this.$set(dataset, "download_running", false);
+        dataset.download_path =
+          "/static/datasets/processed/" + res.data.download_path;
+        // axios.get("http://localhost:5000/" + dataset.download_path);
       });
     },
     downloadDataset(dataset) {

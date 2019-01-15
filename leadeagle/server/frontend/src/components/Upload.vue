@@ -609,7 +609,7 @@ export default {
       addIndex: false,
       thread: 3,
       name: "file",
-      postAction: "/upload",
+      postAction: "/api/datasets/" + this.$route.params.dataset_id + "/upload",
       putAction: "",
       headers: {
         "X-Csrf-Token": "xxxx"
