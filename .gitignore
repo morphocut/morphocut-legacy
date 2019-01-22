@@ -4,4 +4,7 @@
 activate
 experiments/*.zip
 experiments/segmentation_export*
-leadeagle/static/datasets*
+leadeagle/static/datasets/*
+leadeagle/server/static/datasets/*
+experiments/results
+leadeagle/server/static/*
