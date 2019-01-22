@@ -708,34 +708,34 @@ export default {
 
         // Automatic compression
         // 自动压缩
-        if (
-          newFile.file &&
-          newFile.type.substr(0, 6) === "image/" &&
-          this.autoCompress > 0 &&
-          this.autoCompress < newFile.size
-        ) {
-          newFile.error = "compressing";
-          const imageCompressor = new ImageCompressor(null, {
-            convertSize: Infinity,
-            maxWidth: 512,
-            maxHeight: 512
-          });
-          imageCompressor
-            .compress(newFile.file)
-            .then(file => {
-              this.$refs.upload.update(newFile, {
-                error: "",
-                file,
-                size: file.size,
-                type: file.type
-              });
-            })
-            .catch(err => {
-              this.$refs.upload.update(newFile, {
-                error: err.message || "compress"
-              });
-            });
-        }
+        // if (
+        //   newFile.file &&
+        //   newFile.type.substr(0, 6) === "image/" &&
+        //   this.autoCompress > 0 &&
+        //   this.autoCompress < newFile.size
+        // ) {
+        //   newFile.error = "compressing";
+        //   const imageCompressor = new ImageCompressor(null, {
+        //     convertSize: Infinity,
+        //     maxWidth: 512,
+        //     maxHeight: 512
+        //   });
+        //   imageCompressor
+        //     .compress(newFile.file)
+        //     .then(file => {
+        //       this.$refs.upload.update(newFile, {
+        //         error: "",
+        //         file,
+        //         size: file.size,
+        //         type: file.type
+        //       });
+        //     })
+        //     .catch(err => {
+        //       this.$refs.upload.update(newFile, {
+        //         error: err.message || "compress"
+        //       });
+        //     });
+        // }
       }
 
       if (newFile && (!oldFile || newFile.file !== oldFile.file)) {
