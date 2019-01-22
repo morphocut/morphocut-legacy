@@ -3,26 +3,26 @@ from matplotlib.gridspec import GridSpec
 from skimage.io import imread, ImageCollection
 from skimage.color import rgb2gray
 import numpy as np
-from scipy.ndimage.filters import gaussian_filter1d
+from scipy.ndimage.filters import gaussian_filter1d, gaussian_filter
 from skimage.exposure import rescale_intensity
 from scipy.optimize import curve_fit
 
-# images = []
+images = []
 
-# print("Reading collection...")
-# for img in ImageCollection("/data1/mschroeder/Datasets/18-10-15_Sediment_Trap_Fred_LeMoigne/*/*.jpeg"):
-#     images.append(rgb2gray(img))
+print("Reading collection...")
+for img in ImageCollection("C:\Bibliotheken\Dokumente\hiwi_geomar\LeadEagle\Test\Images for Rainer\*\*.jpeg"):
+    images.append(rgb2gray(img))
 
-# min_height = min(img.shape[0] for img in images)
-# min_width = min(img.shape[1] for img in images)
+min_height = min(img.shape[0] for img in images)
+min_width = min(img.shape[1] for img in images)
 
-# images = [img[:min_height, :min_width] for img in images]
+images = [img[:min_height, :min_width] for img in images]
 
-# img = np.mean(images, axis=0)
+img = np.mean(images, axis=0)
 
-# print(img.min(), img.max())
+print(img.min(), img.max())
 
-# img = rescale_intensity(img)
+img = rescale_intensity(img)
 
 fig = plt.figure()
 
@@ -56,3 +56,18 @@ ax_marg_y.plot(marg_y_smooth, np.arange(img.shape[0]))
 ax_marg_y.axhline(center_y)
 
 ax_joint.plot(center_x, center_y, marker='o', markersize=3, color="red")
+
+
+fig1 = plt.figure()
+original_img = fig1.add_subplot(1, 2, 1)
+processed_img = fig1.add_subplot(1, 2, 2)
+original_img.set_title('original')
+processed_img.set_title('processed')
+original_img.imshow(rescale_intensity(images[0]), aspect="equal")
+smooth_vig = gaussian_filter(img, SIGMA, mode="nearest")
+p_img = rescale_intensity(images[0]) * (1 - smooth_vig)
+p_img = rescale_intensity(p_img)
+processed_img.imshow(p_img, aspect="equal")
+
+
+plt.show()
