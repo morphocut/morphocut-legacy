@@ -37,16 +37,30 @@ Create a basic web application.
 ## Week 5 (19-01-07)
 Fixes.
 
-- [ ] Fix and cleanup Upload
+- [ ] Fix and cleanup Upload: Do not compress
 - [ ] Fix EcoTaxa zip (only one ecotaxa_* file)
-- [ ] Apply Martin's remarks
-- [ ] Refactor `/api` into its own Blueprint to keep the main application file clean
+- [x] Apply Martin's remarks
+- [X] Refactor `/api` into its own Blueprint to keep the main application file clean
 - [ ] UI: Browse & Create projects
-- [ ] Create sensible visual structure: Headline for navigation
+- [X] Create sensible visual structure: Headline for navigation
 - [ ] Remove absolute references to `http://localhost:5000`
 - [ ] Implement Auth analogously to MorphoCluster
+    - + Command for creating users
 
-## Week 6
+## Week 6 (19-01-14)
+
+- [x] Pfade anpassen (Konfigurierbares Datenverzeichnis)
+
+## Week 7 (19-01-21)
+
+- [ ] Make download work
+- [ ] Include contour images in ecotaxa export
+- [ ] Draw contours only for one object in single-object image ("Vignette")
+- [ ] Intra-Node computation with `graph.Sequential` (see `experiments.graph`)
+- [ ] Tests
+
+## Week 8
+
 Implement processing nodes.
 
 - [ ] UI: Browse & Create processing nodes
@@ -63,7 +77,3 @@ Implement processing nodes.
     - Do everything (segmentation, object extraction, ...) in one step and write results to the database
   - [ ] Node 3: Export Sink
     - [ ] Generate EcoTaxa Export
-
-## Week 6
-
-Split processing into individual steps.

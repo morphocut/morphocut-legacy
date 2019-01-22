@@ -86,9 +86,17 @@ app.register_blueprint(frontend, url_prefix='/frontend')
 app.register_blueprint(api, url_prefix='/api')
 
 
+@app.route("/")
+def index():
+    print('index request')
+    return redirect(url_for("frontend.index"))
+
+
 # ===============================================================================
 # Authentication
 # ===============================================================================
+
+
 def check_auth(username, password):
     # Retrieve entry from the database
     with database.engine.connect() as conn:

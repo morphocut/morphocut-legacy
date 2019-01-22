@@ -16,6 +16,7 @@
               <th scope="col">Name</th>
               <th scope="col">Objects</th>
               <th></th>
+              <th></th>
             </tr>
           </thead>
           <tbody>
@@ -23,6 +24,9 @@
               <td>{{ dataset.id }}</td>
               <td>{{ dataset.name }}</td>
               <td>{{ dataset.objects }}</td>
+              <td><div v-if="dataset.download_running">
+                  <div class="loader"></div>
+                </div></td>
               <td>
                 <button
                   type="button"
@@ -37,25 +41,12 @@
                   v-if="dataset.download_path"
                   :href="dataset.download_path"
                 >Download</b-button>
-                <div v-if="dataset.download_running">
-                  <div class="loader"></div>
-                </div>
-                <!-- <button
-                  type="button"
-                  class="btn btn-danger btn-sm"
-                  style="margin-left: 0.5rem;"
-                  v-on:click="removeDataset(dataset.id)"
-                >Delete</button>-->
               </td>
             </tr>
           </tbody>
         </table>
       </div>
     </div>
-    <!-- <div v-if="!download_complete">
-      <h1>Processing...</h1>
-      <div class="loader"></div>
-    </div>-->
     <b-modal ref="addDatasetModal" id="dataset-modal" title="Add a new dataset" hide-footer>
       <b-form @submit="onSubmit" @reset="onReset" class="w-100">
         <b-form-group id="form-name-group" label="Name:" label-for="form-name-input">

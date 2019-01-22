@@ -198,3 +198,72 @@ A processing node provides a data structure that completely describes the requir
 - SQLAlchemy ORM
 - http://flask-sqlalchemy.pocoo.org/2.3/models/
 
+## Computation Graph
+
+- Model
+  - NodeClass (<u>class_name</u>, FQN)
+  - NodeInstance (<u>ID</u>, name, class, config)
+    - config: JSON object of configuration values
+  - Slots (<u>node_id</u>, <u>name</u>, [dtype])
+  - Edge (<u>from ID, from slot, to ID, to slot</u>)
+  - Object (project_id, parent_id)
+  - Facet (<u>node id, object id, slot id</u>, meta)
+    - FK: node id, object id, slot id
+    - meta: metadata
+  - ImageData (url, data)
+    - FK: facet_id / node id, object id, slot id
+    - URL: URL to image file on disk
+    - data: Byte string of image data (e.g. PNG) (Optional)
+    - Bounding Box: Bounding box in the on disk file to select a subarea
+
+## Intra-node computation
+
+- One node may consist of multiple chained operations.
+
+- The Elements of the chain pass data in dicts
+
+- Implemented with generators
+
+  ```python
+  seq = Sequential([DataLoader(path, ...), Processor(params...), Export(path)])
+  seq.process()
+  ```
+
+- Data loader class: ~ import_data
+
+  - Reads files, loads images
+
+  - Outputs single image as object
+
+    ```
+    {
+        object_id: ...
+        facets: {
+        	# For DataLoader
+            input_data: {
+                meta: {filename: ...},
+                image: <np.array of shape = [h,w,c]>
+            },
+            # For Processor
+            raw_img: {
+                meta: {region props...},
+                image: <np.array of shape = [h,w,c]>
+            },
+            contour_img: {
+                meta: {},
+                image: <np.array of shape = [h,w,c]>
+            },
+           	# Nothing for export
+        }
+    }
+    ```
+
+- Image Segmentation class: ~ process_single_image
+
+  - Iterates over values of data generator
+  - Outputs single ROI as object
+
+- Ecotaxa export class: ~ export_data
+
+  - Iterates over values of segmentation
+  - Writes ZIP
