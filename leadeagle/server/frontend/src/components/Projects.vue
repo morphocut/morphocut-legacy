@@ -127,26 +127,28 @@ export default {
       axios.get(path).then(res => {
         this.$set(dataset, "download_complete", true);
         this.$set(dataset, "download_running", false);
-        dataset.download_path =
-          "/static/datasets/processed/" + res.data.download_path;
+        console.log("download path: " + res.data.download_path);
+        dataset.download_path = res.data.download_path;
+        // dataset.download_path =
+        //   "/static/datasets/processed/" + res.data.download_path;
         // axios.get("http://localhost:5000/" + dataset.download_path);
       });
     },
-    downloadDataset(dataset) {
-      const path = "http://localhost:5000/" + dataset.download_path;
-      axios({
-        url: path,
-        method: "GET",
-        responseType: "blob" // important
-      }).then(response => {
-        const url = window.URL.createObjectURL(new Blob([response.data]));
-        const link = document.createElement("a");
-        link.href = url;
-        link.setAttribute("download", dataset.download_path);
-        document.body.appendChild(link);
-        link.click();
-      });
-    },
+    // downloadDataset(dataset) {
+    //   const path = "http://localhost:5000/" + dataset.download_path;
+    //   axios({
+    //     url: path,
+    //     method: "GET",
+    //     responseType: "blob" // important
+    //   }).then(response => {
+    //     const url = window.URL.createObjectURL(new Blob([response.data]));
+    //     const link = document.createElement("a");
+    //     link.href = url;
+    //     link.setAttribute("download", dataset.download_path);
+    //     document.body.appendChild(link);
+    //     link.click();
+    //   });
+    // },
     initForm() {
       this.addDatasetForm.id = 0;
       this.addDatasetForm.name = "";

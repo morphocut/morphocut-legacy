@@ -16,6 +16,7 @@ from flask import (Flask, Response, abort, redirect, render_template, request,
                    url_for)
 import json
 import urllib.parse
+import pathlib
 
 from flask.helpers import send_from_directory
 from flask.blueprints import Blueprint
@@ -91,17 +92,22 @@ def process_dataset_route(id):
 
                 import_path = os.path.join(
                     app.root_path, app.config['UPLOAD_FOLDER'], dataset_path)
+
                 relative_export_path = os.path.join(
-                    app.config['UPLOAD_FOLDER'], 'datasets', 'processed')
+                    app.config['UPLOAD_FOLDER'], dataset_path)
+                relative_download_path = '/' + \
+                    app.config['UPLOAD_FOLDER'] + '/' + dataset_path + '/'
                 export_path = os.path.join(
                     app.root_path, relative_export_path)
 
-                download_path = segmentation.process(
+                download_filename = segmentation.process(
                     import_path, export_path)
 
-                response_object['download_path'] = urllib.parse.urljoin(
-                    relative_export_path, download_path)
-                response_object['download_filename'] = download_path
+                print('download path: ' +
+                      relative_download_path + download_filename)
+                response_object['download_path'] = relative_download_path + \
+                    download_filename
+                response_object['download_filename'] = download_filename
     return jsonify(response_object)
 
 
@@ -117,8 +123,8 @@ def upload(id):
         if file and allowed_file(file.filename):
             # filename = secure_filename(file.filename)
             filename = file.filename
-            filepath = os.path.normpath(os.path.join(
-                flask.current_app.config['UPLOAD_FOLDER'], dataset['path'], filename))
+            filepath = os.path.normpath(os.path.join(flask.current_app.root_path,
+                                                     flask.current_app.config['UPLOAD_FOLDER'], dataset['path'], filename))
 
             if not os.path.exists(os.path.dirname(filepath)):
                 try:

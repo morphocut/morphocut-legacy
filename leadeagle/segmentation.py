@@ -39,15 +39,8 @@ def get_property_column_types():
                 'object_filled_area': '[f]',
                 'object_local_centroid_row': '[f]',
                 'object_local_centroid_col': '[f]',
-                # 'object_max_intensity': '[f]',
-                # 'object_mean_intensity': '[f]',
-                # 'object_min_intensity': '[f]',
                 'object_perimeter': '[f]',
                 'object_solidity': '[f]',
-                # 'object_weighted_centroid_row': '[f]',
-                # 'object_weighted_centroid_col': '[f]',
-                # 'object_weighted_local_centroid_row': '[f]',
-                # 'object_weighted_local_centroid_col': '[f]',
                 }
     return propDict
 
@@ -82,15 +75,8 @@ def get_properties_list(original):
             'object_filled_area': property.filled_area,
             'object_local_centroid_row': property.local_centroid[0],
             'object_local_centroid_col': property.local_centroid[1],
-            # 'object_max_intensity': property.max_intensity,
-            # 'object_mean_intensity': property.mean_intensity,
-            # 'object_min_intensity': property.min_intensity,
             'object_perimeter': property.perimeter,
             'object_solidity': property.solidity,
-            # 'object_weighted_centroid_row': property.weighted_centroid[0],
-            # 'object_weighted_centroid_col': property.weighted_centroid[1],
-            # 'object_weighted_local_centroid_row': property.weighted_local_centroid[0],
-            # 'object_weighted_local_centroid_col': property.weighted_local_centroid[1],
         }
         prop_list.append(propDict)
     return prop_list
@@ -104,7 +90,7 @@ def export_image_regions(original, zip):
 
     bar = ProgressBar(len(original['properties']), max_width=40)
     for i, property in enumerate(original['properties']):
-        
+
         # Define bounding box and position of the object
         x = property.bbox[0]
         y = property.bbox[1]
@@ -124,19 +110,6 @@ def export_image_regions(original, zip):
         # Create the masked and the masked contour image of the object
         original_masked = original['img'][xmin:xmax, ymin:ymax]
         contours_masked = original['contour_img'][xmin:xmax, ymin:ymax]
-
-        # object_image = original_masked
-        # mask_masked = mask[x:x+w, y:y+h]
-
-        # object_image = cv.bitwise_and(
-        #     original_masked, original_masked, mask=mask_masked)
-        # coloured = object_image.copy()
-        # object_image[mask_masked == 0] = (255, 255, 255)
-        # object_image = cv.cvtColor(object_image, cv.COLOR_BGR2GRAY)
-
-        # bordersize = 20
-        # object_image = cv.copyMakeBorder(object_image, top=bordersize, bottom=bordersize, left=bordersize,
-        #                     right=bordersize, borderType=cv.BORDER_CONSTANT, value=[255, 255, 255])
 
         # Save the created images to the zipfile
         filename = "{}_{}.png".format(original['object_id'], i)
@@ -168,6 +141,7 @@ def import_data(source_filePath):
         print('importing ' + source_filePath)
         object_id = parse("{}.{}", fileName)[0]
         img = cv.imread(source_filePath)
+        img = correct_vignette(img)
         originals.append(dict(object_id=object_id, img=img))
     # If it is not an image file, load the image files in the folder
     else:
@@ -178,6 +152,7 @@ def import_data(source_filePath):
                     filePath = os.path.join(root, name)
                     object_id = parse("{}.{}", name)[0]
                     img = cv.imread(filePath)
+                    img = correct_vignette(img)
                     originals.append(dict(object_id=object_id, img=img))
 
     return originals
@@ -214,7 +189,7 @@ def process_single_image(original):
     src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
 
     # Segment foreground objects from background objects using thresholding with the otsu method
-    _ ,mask = cv.threshold(src, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
+    _, mask = cv.threshold(src, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
     mask = cv.bitwise_not(mask)
 
     # Alternative to otsu method, using adaptive thresholding
@@ -247,7 +222,18 @@ def process_single_image(original):
 
 
 def correct_vignette(img):
-    return img
+    size_0 = img.shape[0]
+    size_1 = img.shape[1]
+    border_0 = int(size_0 / 10)
+    border_1 = int(size_1 / 10)
+    vignette_cut_img = img[border_0:size_0 -
+                           border_0, border_1:size_1 - border_1]
+
+    # cv.imshow('original', img)
+    # cv.imshow('removed vignette', vignette_cut_img)
+    # cv.waitKey()
+
+    return vignette_cut_img
 
 
 def export_data(originals, export_path):
@@ -265,7 +251,7 @@ def export_data(originals, export_path):
 
     # Create the zip file
     with ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as myzip:
-        
+
         prop_list = []
         prop_list.insert(0, get_property_column_types())
         for original in originals:

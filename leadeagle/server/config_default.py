@@ -13,7 +13,7 @@ SQLALCHEMY_DATABASE_OPTIONS = {
 # Project export directory
 PROJECT_EXPORT_DIR = "/tmp"
 
-# UPLOAD_FOLDER = "/home/mschroeder/LeadEagle/leadeagle/leadeagle/server/static"
+UPLOAD_FOLDER = 'static'
 
 # Upload Settings
 ALLOWED_EXTENSIONS = set(
