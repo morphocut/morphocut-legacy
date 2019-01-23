@@ -9,9 +9,8 @@
       Options
     </button>
     <!-- @Christian: When the component is mounted, initialize the dataset using the given dataset_id. -->
-    <!-- <h1 id="example-title" class="example-title">{{dataset.name}}: Upload</h1> -->
-    <h1 id="example-title" class="example-title">Dataset: Upload</h1>
-
+    <h1 id="example-title" class="example-title">{{dataset.name}}: Upload</h1>
+    <!-- <h1 id="example-title" class="example-title">Dataset: Upload</h1> -->
     <!-- Drop Modal that shows up, when hovering above the page with files -->
     <div v-show="$refs.upload && $refs.upload.dropActive" class="drop-active">
       <h3>Hello there! Drop files to upload</h3>
@@ -498,13 +497,6 @@
         </div>
       </div>
     </div>
-
-    <div class="pt-5">
-      Source code:
-      <a
-        href="https://github.com/lian-yue/vue-upload-component/blob/master/docs/views/examples/Full.vue"
-      >/docs/views/examples/Full.vue</a>
-    </div>
   </div>
 </template>
 <style>
@@ -672,12 +664,21 @@ export default {
   },
 
   methods: {
+    getDataset() {
+      const path = "/api/datasets/" + this.$route.params.dataset_id;
+      axios
+        .get(path)
+        .then(res => {
+          this.dataset = res.data.dataset;
+          console.log(this.dataset);
+        })
+        .catch(error => {
+          // eslint-disable-next-line
+          console.error(error);
+        });
+    },
     getDatasetFiles() {
-      //@Christian: this.$route.params.dataset_id
       const path = "/api/datasets/" + this.$route.params.dataset_id + "/files";
-      // const path = "/api";
-      // this.alert("calling: " + path);
-      // console.log("calling: " + path);
       axios
         .get(path)
         .then(res => {
@@ -926,17 +927,8 @@ export default {
     }
   },
   created() {
-    // @Christian: Load this.dataset using the dataset_id given in the route.
+    this.getDataset();
     this.getDatasetFiles();
-    // this.alert(
-    //   "the dataset is { id: " +
-    //     this.$route.params.dataset.id +
-    //     ", name: " +
-    //     this.$route.params.dataset.name +
-    //     ", objects: " +
-    //     this.$route.params.dataset.objects +
-    //     " }"
-    // );
   }
 };
 </script>

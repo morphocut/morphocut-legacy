@@ -45,6 +45,14 @@ def get_dataset_files_route(id):
     return jsonify(response_object)
 
 
+@api.route('/datasets/<id>', methods=['GET'])
+def get_dataset_route(id):
+    response_object = {'status': 'success'}
+    if request.method == 'GET':
+        response_object['dataset'] = get_dataset(id)
+    return jsonify(response_object)
+
+
 @api.route('/datasets', methods=['GET', 'POST'])
 def get_datasets_route():
     response_object = {'status': 'success'}
