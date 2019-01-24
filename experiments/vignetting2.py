@@ -25,49 +25,51 @@ def create_slices(shape, n):
     return list(itertools.product(*slices))
 
 
-def remove_objects(image, n=5):
+def remove_objects(image, n=5, agg=np.mean):
     """
     Parameters:
-        image (np.ndarray of shape = [h,w,c]): Image to clear.
+        image (np.ndarray of shape = [h,w]): Image to clear.
         n: number of slices per spatial dimension.
     """
 
     image = image.copy()
-    image_gray = rgb2gray(image)
 
-    for s in create_slices(image_gray.shape, n):
+    for s in create_slices(image.shape, n):
         tile = image[s]
-        tile_gray = image_gray[s]
 
         try:
-            thr = threshold_otsu(tile_gray)
+            thr = threshold_otsu(tile)
         except ValueError:
             pass
         else:
-            obj_mask = tile_gray < thr
+            obj_mask = tile < thr
 
-            bg_mean = np.mean(tile[~obj_mask], axis=(0, 1))
+            bg_mean = agg(tile[~obj_mask])
 
             tile[obj_mask] = bg_mean
 
     return image
 
 
-img_collection = ImageCollection(
-    "/data1/mschroeder/Datasets/18-10-15_Sediment_Trap_Fred_LeMoigne/*/*.jpeg")
+def correct_vignetting(img):
+    img_gray = rgb2gray(img)
+    img_gray = remove_objects(img_gray, 5, agg=np.median)
 
-img = img_collection[1]
+    img_smooth = gaussian(img_gray, 75)
 
-img2 = remove_objects(img, 5)
+    return img_gray, img_smooth, img / img_smooth[:, :, np.newaxis] / 255
 
-# Maybe use spline interpolation instead? May be faster?
-# https://docs.scipy.org/doc/scipy/reference/tutorial/interpolate.html
-img3 = gaussian(img2, 75, multichannel=True)
 
-corrected = img / img3 / 255
+if __name__ == "__main__":
+    img_collection = ImageCollection(
+        "/data1/mschroeder/Datasets/18-10-15_Sediment_Trap_Fred_LeMoigne/*/*.jpeg")
 
-fig, axes = plt.subplots(2, 2, sharex=True, sharey=True)
-axes[0, 0].imshow(img)
-axes[0, 1].imshow(img2)
-axes[1, 0].imshow(img3)
-axes[1, 1].imshow(corrected)
+    img = img_collection[1]
+
+    img_gray, img_smooth, corrected = correct_vignetting(img)
+
+    fig, axes = plt.subplots(2, 2, sharex=True, sharey=True)
+    axes[0, 0].imshow(img)
+    axes[0, 1].imshow(img_gray, cmap="gray")
+    axes[1, 0].imshow(img_smooth, cmap="gray")
+    axes[1, 1].imshow(corrected)
