@@ -20,8 +20,12 @@ if "images" not in locals():
 
     images = [img[:min_height, :min_width] for img in images]
 
-#img = np.mean(images, axis=0)
-img = images[3]
+print("Mean...")
+img = np.mean(images, axis=0)
+#img = images[3]
+
+print("Correcting...")
+img_corrected = np.mean([correct_vignetting(img) for img in images], axis=0)
 
 
 def imshow_with_marginals(img):
@@ -70,6 +74,6 @@ def imshow_with_marginals(img):
 
 imshow_with_marginals(rescale_intensity(rgb2gray(img)))
 
-_, _, img = correct_vignetting(img)
+#_, _, img = correct_vignetting(img)
 
-imshow_with_marginals(rescale_intensity(rgb2gray(img)))
+imshow_with_marginals(rescale_intensity(rgb2gray(img_corrected)))
