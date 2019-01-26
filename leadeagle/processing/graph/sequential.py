@@ -12,9 +12,9 @@ class Sequential(NodeBase):
     def append(self, node):
         self.sequence.append(node)
 
-    def process(self, input=None):
+    def __call__(self, input=None):
         wp = input
         for n in self.sequence:
-            wp = n.process(wp)
+            wp = n(wp)
 
         return wp

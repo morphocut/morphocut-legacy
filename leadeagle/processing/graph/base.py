@@ -5,7 +5,7 @@ __all__ = ["NodeBase"]
 
 class NodeBase(ABC):
     @abstractmethod
-    def process(self, input=None):
+    def __call__(self, input=None):
         """
         Process the input stream
         """
