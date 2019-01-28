@@ -4,6 +4,7 @@ from skimage.filters import threshold_otsu, gaussian
 from skimage.color import rgb2gray
 import numpy as np
 from skimage.io import ImageCollection
+import operator
 
 
 def create_slices(shape, n):
@@ -49,6 +50,21 @@ def remove_objects(image, n=5, agg=np.mean):
             tile[obj_mask] = bg_mean
 
     return image
+
+
+def tiled_threshold(img, n=5, op=operator.lt):
+    mask = np.zeros(img.shape[:2], dtype=np.bool)
+
+    for s in create_slices(img.shape, n):
+        tile = img[s]
+        try:
+            thr = threshold_otsu(tile)
+        except ValueError:
+            pass
+
+        mask[s] = op(tile, thr)
+
+    return mask
 
 
 def correct_vignetting(img):

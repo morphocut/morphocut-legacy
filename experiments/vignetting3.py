@@ -4,19 +4,18 @@ therefore seems not to be create by one single aperture,
 try Splines.
 """
 
-from skimage.io import imread
-from skimage.color import rgb2gray
-from skimage.feature import canny
+import operator
+
 import matplotlib.pyplot as plt
-from skimage.filters.rank import maximum
-from skimage.morphology import disk
-from skimage import img_as_uint
-from skimage.morphology import dilation, binary_erosion
 import numpy as np
-from skimage.filters import gaussian
-from scipy.ndimage.morphology import distance_transform_cdt
-from skimage.filters import threshold_otsu
 from scipy import interpolate
+from skimage.color import rgb2gray
+from skimage.filters import gaussian, scharr, threshold_otsu
+from skimage.filters.rank import maximum
+from skimage.io import imread
+from skimage.morphology import binary_dilation, binary_erosion, dilation, disk
+
+from vignetting2 import tiled_threshold
 
 print("Loading...")
 img = imread(
@@ -25,14 +24,15 @@ img = imread(
 img = rgb2gray(img)
 
 # Blur image to make dilation more robust
-
 img = gaussian(img, 3)
 
 # Find obvious objects
 thr = threshold_otsu(img)
-
+# thr = np.quantile(img, 0.0625)
 valid_mask = img > thr
+#valid_mask = tiled_threshold(img, n=5, op=operator.gt)
 
+# Shrink valid regions
 valid_mask = binary_erosion(valid_mask, disk(16))
 
 print("Dilating...")
@@ -40,9 +40,9 @@ max_img = dilation(img, disk(16))
 
 # img_inpaint = cv2.inpaint(img, mask, 3, cv2.INPAINT_TELEA)
 
-invalid_mask = ~valid_mask
+invalid_mask = np.bitwise_not(valid_mask)
 
-valid_mask &= dilation(invalid_mask, disk(1))
+valid_mask &= binary_dilation(invalid_mask, disk(1))
 
 # Interpolate masked image
 print("Fitting interpolator...")
@@ -59,10 +59,15 @@ img_filled[invalid_mask] = interpolator(coords_invalid)
 mask = np.isnan(img_filled)
 img_filled[mask] = max_img[mask]
 
-fig, axes = plt.subplots(nrows=2, ncols=2, sharex=True, sharey=True)
+# Blur background
+print("Blurring...")
+img_filled = gaussian(img_filled, 64)
+
+fig, axes = plt.subplots(nrows=2, ncols=3, sharex=True, sharey=True)
 
 vmax = max_img.max()
 axes[0, 0].imshow(img, vmin=0, vmax=vmax)
 axes[0, 1].imshow(img_filled, vmin=0, vmax=vmax)
+axes[0, 2].imshow(scharr(img_filled))
 axes[1, 0].imshow(invalid_mask, cmap="gray")
 axes[1, 1].imshow(img / img_filled)
