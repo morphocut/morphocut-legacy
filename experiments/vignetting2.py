@@ -4,6 +4,7 @@ from skimage.filters import threshold_otsu, gaussian
 from skimage.color import rgb2gray
 import numpy as np
 from skimage.io import ImageCollection
+import getpass
 
 
 def create_slices(shape, n):
@@ -53,8 +54,14 @@ def remove_objects(image, n=5):
     return image
 
 
-img_collection = ImageCollection(
-    "/data1/mschroeder/Datasets/18-10-15_Sediment_Trap_Fred_LeMoigne/*/*.jpeg")
+user = getpass.getuser()
+
+if (user == 'Christian'):
+    img_collection = ImageCollection(
+        "C:\Bibliotheken\Dokumente\hiwi_geomar\LeadEagle\Test\Images for Rainer\*\*.jpeg")
+else:
+    img_collection = ImageCollection(
+        "/data1/mschroeder/Datasets/18-10-15_Sediment_Trap_Fred_LeMoigne/*/*.jpeg")
 
 img = img_collection[1]
 
@@ -71,3 +78,5 @@ axes[0, 0].imshow(img)
 axes[0, 1].imshow(img2)
 axes[1, 0].imshow(img3)
 axes[1, 1].imshow(corrected)
+
+plt.show()
