@@ -1,7 +1,10 @@
 from leadeagle.processing.graph import *
 
-s = Sequential()
-s.append(LocalDirectoryInput("/path/to/images"))
+input = LocalDirectoryInput("/home/moi/Work/18-10-15 Sediment Trap Fred LeMoigne")
+print(input.get_options())
 
-for wp in s.process():
+s = Sequential()
+s.append(input)
+
+for wp in s():
     print(wp)
