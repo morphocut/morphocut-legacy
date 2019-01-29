@@ -12,6 +12,11 @@ import datetime
 from io import StringIO
 from zipfile import ZipFile
 import zipfile
+import leadeagle.processing.functional as proc
+from skimage.exposure import rescale_intensity
+from skimage.morphology import binary_dilation, disk
+from skimage import img_as_ubyte
+import math
 
 
 def get_property_column_types():
@@ -19,7 +24,7 @@ def get_property_column_types():
     Returns the column types for the columns in the tsv file for the ecotaxa export
     '''
     propDict = {'img_file_name': '[t]',
-
+                'contour_img_file_name': '[t]',
                 'object_id': '[t]',
                 'object_date': '[t]',
                 'object_time': '[t]',
@@ -56,6 +61,7 @@ def get_properties_list(original):
     for i, property in enumerate(original['properties']):
         propDict = {
             'img_file_name': "{}_{}.png".format(original['object_id'], i),
+            'contour_img_file_name': "{}_{}_contours.png".format(original['object_id'], i),
             'object_id': "{}_{}".format(original['object_id'], i),
             'object_date': str(datetime.datetime.now().strftime('%Y%m%d')),
             'object_time': str(datetime.datetime.now().strftime('%H%M%S')),
@@ -107,9 +113,40 @@ def export_image_regions(original, zip):
         ymin = max(0, y - bordersize_h)
         ymax = min(original['img'].shape[1], y + h + bordersize_h)
 
+        border_top = y - ymin
+        border_bottom = ymax - (y + h)
+        border_left = x - xmin
+        border_right = xmax - (x + w)
+
+        # print('src (w/h): ' + str(w) + ', ' + str(h))
+        # print('border_top: ' + str(border_top))
+        # print('border_bottom: ' + str(border_bottom))
+        # print('border_left: ' + str(border_left))
+        # print('border_right: ' + str(border_right))
+
         # Create the masked and the masked contour image of the object
-        original_masked = original['img'][xmin:xmax, ymin:ymax]
-        contours_masked = original['contour_img'][xmin:xmax, ymin:ymax]
+        original_masked = original['src'][xmin:xmax, ymin:ymax]
+
+        bordered_mask = cv.copyMakeBorder(img_as_ubyte(property.filled_image), top=border_left,
+                                          bottom=border_right, left=border_top, right=border_bottom, borderType=cv.BORDER_CONSTANT)
+
+        f = 0.1
+        dilated_mask = img_as_ubyte(binary_dilation(
+            bordered_mask, selem=disk(radius=f * math.sqrt(property.filled_area))))
+
+        c_img, contours, hierarchy = cv.findContours(dilated_mask, 1, 2)
+        contour_image = original_masked.copy()
+        cv.drawContours(contour_image, contours, -1, (0, 255, 0), 1)
+
+        contours_masked = contour_image
+        # contours_masked = original['contour_img'][xmin:xmax, ymin:ymax]
+
+        # print('original: ' + str(original_masked.shape))
+        # print('bordered: ' + str(bordered_mask.shape))
+        # print('contour: ' + str(contour_image.shape))
+
+        # cv.imshow('contours', contour_image)
+        # cv.waitKey()
 
         # Save the created images to the zipfile
         filename = "{}_{}.png".format(original['object_id'], i)
@@ -141,8 +178,8 @@ def import_data(source_filePath):
         print('importing ' + source_filePath)
         object_id = parse("{}.{}", fileName)[0]
         img = cv.imread(source_filePath)
-        img = correct_vignette(img)
-        originals.append(dict(object_id=object_id, img=img))
+        corrected_img = correct_vignette(img)
+        originals.append(dict(object_id=object_id, img=corrected_img, src=img))
     # If it is not an image file, load the image files in the folder
     else:
         for root, dirs, files in os.walk(source_filePath, topdown=False):
@@ -152,8 +189,9 @@ def import_data(source_filePath):
                     filePath = os.path.join(root, name)
                     object_id = parse("{}.{}", name)[0]
                     img = cv.imread(filePath)
-                    img = correct_vignette(img)
-                    originals.append(dict(object_id=object_id, img=img))
+                    corrected_img = correct_vignette(img)
+                    originals.append(
+                        dict(object_id=object_id, img=corrected_img, src=img))
 
     return originals
 
@@ -186,7 +224,9 @@ def process_single_image(original):
     src = original['img']
 
     # Convert the image into grayscale colorspace
-    src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
+    # cv.imshow(str(src.dtype), src)
+    # cv.waitKey()
+    # src = cv.cvtColor(src, cv.COLOR_BGR2GRAY)
 
     # Segment foreground objects from background objects using thresholding with the otsu method
     _, mask = cv.threshold(src, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
@@ -206,34 +246,43 @@ def process_single_image(original):
     properties = [p for p in properties if p.area > areaThreshold]
 
     # Create an image with the contours of all the objects marked
-    c_img, contours, hierarchy = cv.findContours(mask, 1, 2)
-    contour_image = original['img'].copy()
-    cv.drawContours(contour_image, contours, -1, (0, 255, 0), 1)
+    # c_img, contours, hierarchy = cv.findContours(mask, 1, 2)
+    # contour_image = original['src'].copy()
+    # cv.drawContours(contour_image, contours, -1, (0, 255, 0), 1)
 
-    print(original['object_id'] + ': '
-          + str(len(properties)) + ' objects found!')
+    print(original['object_id'] + ': ' +
+          str(len(properties)) + ' objects found!')
 
     # masked = cv.bitwise_and(original['img'], original['img'], mask=mask)
 
     # Save the calculated properties and images to a dictionary
     original['mask'] = mask
     original['properties'] = properties
-    original['contour_img'] = contour_image
+    # original['contour_img'] = contour_image
 
 
 def correct_vignette(img):
-    size_0 = img.shape[0]
-    size_1 = img.shape[1]
-    border_0 = int(size_0 / 10)
-    border_1 = int(size_1 / 10)
-    vignette_cut_img = img[border_0:size_0 -
-                           border_0, border_1:size_1 - border_1]
+    # size_0 = img.shape[0]
+    # size_1 = img.shape[1]
+    # border_0 = int(size_0 / 10)
+    # border_1 = int(size_1 / 10)
+    # vignette_cut_img = img[border_0:size_0 -
+    #                        border_0, border_1:size_1 - border_1]
 
     # cv.imshow('original', img)
     # cv.imshow('removed vignette', vignette_cut_img)
     # cv.waitKey()
 
-    return vignette_cut_img
+    grey_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
+    flat_image = proc.calculate_flat_image(grey_img)
+    corrected_img = grey_img / flat_image
+    corrected_img = rescale_intensity(corrected_img)
+    corrected_img = img_as_ubyte(corrected_img)
+
+    # cv.imshow(str(corrected_img.dtype), corrected_img)
+    # cv.waitKey()
+
+    return corrected_img
 
 
 def export_data(originals, export_path):
@@ -299,7 +348,7 @@ def process(source_filepath, export_path):
     '''
     # Import the data from source_filepath
     originals = import_data(source_filepath)
-    print('importing files from ' + source_filepath)
+    print('importing files from ' + source_filepath + ' done!')
 
     # Process the data
     for original in originals:
@@ -307,6 +356,8 @@ def process(source_filepath, export_path):
 
     # Export the data
     zip_filepath = export_data(originals, export_path)
+
+    print('processing done!')
 
     return zip_filepath
 

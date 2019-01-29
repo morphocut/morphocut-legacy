@@ -73,12 +73,31 @@ def reset_db():
         flask_migrate.stamp()
 
 
-@app.cli.command('hello_cmd')
-def hello_cmd():
-    """
-    Drop all tables and recreate.
-    """
-    print("hello")
+@app.cli.command()
+@click.argument('username')
+def add_user(username):
+    print("Adding user {}:".format(username))
+    password = getpass("Password: ")
+    password_repeat = getpass("Retype Password: ")
+
+    if not len(password):
+        print("Password must not be empty!")
+        return
+
+    if password != password_repeat:
+        print("Passwords do not match!")
+        return
+
+    pwhash = generate_password_hash(
+        password, method='pbkdf2:sha256:10000', salt_length=12)
+
+    try:
+        with database.engine.connect() as conn:
+            stmt = models.users.insert(
+                {"username": username, "pwhash": pwhash})
+            conn.execute(stmt)
+    except IntegrityError as e:
+        print(e)
 
 
 # Register API and frontend
@@ -110,7 +129,7 @@ def check_auth(username, password):
     return check_password_hash(user["pwhash"], password)
 
 
-# @app.before_request
+@app.before_request
 def require_auth():
     # exclude 404 errors and static routes
     # uses split to handle blueprint static routes as well

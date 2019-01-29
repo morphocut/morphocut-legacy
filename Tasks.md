@@ -30,21 +30,21 @@ Create a basic web application.
 - [x] DB-Model: Dataset (<u>ID</u>, name, path), File (<u>Dataset ID, subpath</u>, modification time, size)
   - http://flask-sqlalchemy.pocoo.org/2.3/models/
 - [ ] UI: Browse files
-- [ ] API:
+- [x] API:
   - `/api/datasets/<id>/files/<path>`
   - `/api/projects/<id>`
 
 ## Week 5 (19-01-07)
 Fixes.
 
-- [ ] Fix and cleanup Upload: Do not compress
-- [ ] Fix EcoTaxa zip (only one ecotaxa_* file)
+- [x] Fix and cleanup Upload: Do not compress
+- [x] Fix EcoTaxa zip (only one ecotaxa_* file)
 - [x] Apply Martin's remarks
 - [X] Refactor `/api` into its own Blueprint to keep the main application file clean
 - [ ] UI: Browse & Create projects
 - [X] Create sensible visual structure: Headline for navigation
-- [ ] Remove absolute references to `http://localhost:5000`
-- [ ] Implement Auth analogously to MorphoCluster
+- [x] Remove absolute references to `http://localhost:5000`
+- [x] Implement Auth analogously to MorphoCluster
     - + Command for creating users
 
 ## Week 6 (19-01-14)
@@ -54,7 +54,7 @@ Fixes.
 ## Week 7 (19-01-21)
 
 - [ ] Make download work
-- [ ] Include contour images in ecotaxa export
+- [x] Include contour images in ecotaxa export
 - [ ] Draw contours only for one object in single-object image ("Vignette")
 - [ ] Intra-Node computation with `graph.Sequential` (see `experiments.graph`)
 - [ ] Tests

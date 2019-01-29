@@ -126,17 +126,6 @@ export default {
     },
     removeDataset(id) {
       console.log("remove dataset: " + id);
-      // const path = "http://localhost:5000/datasets";
-      // axios
-      //   .post(path, payload)
-      //   .then(() => {
-      //     this.getDatasets();
-      //   })
-      //   .catch(error => {
-      //     // eslint-disable-next-line
-      //     console.log(error);
-      //     this.getDatasets();
-      //   });
     },
     initForm() {
       this.addDatasetForm.id = 0;

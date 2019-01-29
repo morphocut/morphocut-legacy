@@ -36,6 +36,6 @@ objects = Table('objects', metadata,
 #: :type objects: sqlalchemy.sql.schema.Table
 users = Table('users', metadata,
               Column('user_id', Integer, primary_key=True),
-              Column('name', String),
-              Column('email', String),
+              Column('username', String),
+              Column('pwhash', String),
               )
