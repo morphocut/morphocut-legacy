@@ -1,7 +1,7 @@
-from leadeagle.processing.graph import NodeBase
+from leadeagle.processing.pipeline import NodeBase
 
 
-class Sequential(NodeBase):
+class Pipeline(NodeBase):
     """
     A sequence of individual processing nodes.
     """

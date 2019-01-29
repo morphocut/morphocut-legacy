@@ -3,7 +3,7 @@ Input nodes
 """
 
 import os
-from leadeagle.processing.graph import NodeBase
+from leadeagle.processing.pipeline import NodeBase
 
 
 class LocalDirectoryInput(NodeBase):
@@ -20,7 +20,7 @@ class LocalDirectoryInput(NodeBase):
 
     def get_options(self):
         index = self.get_index()
-        
+
         if self.index is None:
             self._make_index()
 
@@ -32,8 +32,9 @@ class LocalDirectoryInput(NodeBase):
 
         index_extensions = {".tsv", ".csv"}
 
-        index_files = [f for f in self.index["files"] if os.path.splitext(f)[1] in index_extensions]
-        
+        index_files = [f for f in self.index["files"]
+                       if os.path.splitext(f)[1] in index_extensions]
+
         return {
             "object_extensions": object_extensions,
             "index_files": index_files,
@@ -51,7 +52,6 @@ class LocalDirectoryInput(NodeBase):
             index["files"].extend(os.path.join(rel_root, f) for f in files)
 
         self.index = index
-
 
     def __call__(self, input=None):
         while False:
