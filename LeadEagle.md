@@ -258,12 +258,17 @@ A processing node provides a data structure that completely describes the requir
     }
     ```
 
+- Vignetting correction: `__init__(self, input_facet: str, output_facet: str, [params...])`
+
 - Image Segmentation class: ~ process_single_image
+  `__init__(self, input_facet: str, output_facet: str, min_object_area=None, padding=None, ...)`
 
   - Iterates over values of data generator
   - Outputs single ROI as object
 
 - Ecotaxa export class: ~ export_data
+
+  `__init__(self, input_facet: str, output_facet: str, output_path, ...)`
 
   - Iterates over values of segmentation
   - Writes ZIP
