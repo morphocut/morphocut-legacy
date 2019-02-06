@@ -16,5 +16,4 @@ class Pipeline(NodeBase):
         wp = input
         for n in self.sequence:
             wp = n(wp)
-
         return wp

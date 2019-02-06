@@ -1,12 +1,35 @@
+# {
+#     object_id: ...
+#     facets: {
+#         # For DataLoader
+#         input_data: {
+#             meta: {filename: ...},
+#             image: <np.array of shape = [h,w,c]>
+#         },
+#         # For Processor
+#         raw_img: {
+#             meta: {region props...},
+#             image: <np.array of shape = [h,w,c]>
+#         },
+#         contour_img: {
+#             meta: {},
+#             image: <np.array of shape = [h,w,c]>
+#         },
+#         # Nothing for export
+#     }
+# }
+
+
 """
 Input nodes
 """
 
 import os
 from leadeagle.processing.pipeline import NodeBase
+import cv2 as cv
 
 
-class LocalDirectoryInput(NodeBase):
+class DataLoader(NodeBase):
     """
     Read the contents of a local directory and yield processing objects.
 
@@ -17,6 +40,8 @@ class LocalDirectoryInput(NodeBase):
         self.location = location
         self._index = None
         self.object_extensions = object_extensions
+
+        self._get_index()
 
     def get_options(self):
         index = self._get_index()
@@ -45,17 +70,29 @@ class LocalDirectoryInput(NodeBase):
         Scan the location for files and create index.
         """
         print("Reading location {}...".format(self.location))
+        self.object_extensions = {".jpeg", ".jpg", ".png", ".gif", ".tif"}
         index = {"dirs": [], "files": [], "root_files": []}
         for root, dirs, files in os.walk(os.path.abspath(self.location)):
             rel_root = os.path.relpath(root, self.location)
-            print(rel_root)
             index["dirs"].extend(os.path.join(rel_root, d) for d in dirs)
-            index["files"].extend(os.path.join(rel_root, f) for f in files)
-            index["root_files"].extend(os.path.join(root, f) for f in files)
+            index["files"].extend(dict(
+                filename=f.split('.')[0],
+                filepath=os.path.join(root, f)
+            ) for f in files if os.path.splitext(f)[1] in self.object_extensions)
         self.index = index
 
     def __call__(self, input=None):
-        i = 0
-        while i < len(self.index['root_files']):
-            yield self.index['root_files'][i]
-            i += 1
+        for file in self.index['files']:
+            print('Loading file ' + file['filepath'])
+            data_object = dict(
+                object_id=file['filename'],
+                facets=dict(
+                    input_data=dict(
+                        meta=dict(
+                            filename=file['filename'],
+                            filepath=file['filepath'],
+                        ),
+                        image=cv.imread(file['filepath'])
+                    )
+                ))
+            yield data_object
