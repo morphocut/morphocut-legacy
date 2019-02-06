@@ -33,6 +33,7 @@ from leadeagle.server import models
 from leadeagle import segmentation
 from leadeagle.server.extensions import database, migrate, redis_store
 from leadeagle.server.frontend import frontend
+from leadeagle.processing.pipeline import *
 
 api = Blueprint("api", __name__)
 
@@ -97,11 +98,13 @@ def process_dataset_route(id):
                 export_path = os.path.join(
                     app.root_path, relative_export_path)
 
-                download_filename = segmentation.process(
-                    import_path, export_path)
+                download_filename = process_and_zip(import_path, export_path)
 
-                print('download path: ' +
-                      relative_download_path + download_filename)
+                # download_filename = segmentation.process(
+                #     import_path, export_path)
+
+                print('download path: '
+                      + relative_download_path + download_filename)
                 response_object['download_path'] = relative_download_path + \
                     download_filename
                 response_object['download_filename'] = download_filename
@@ -142,6 +145,27 @@ def upload(id):
     elif request.method == 'PUT':
         print('put put put')
     return jsonify(response_object)
+
+
+def process_and_zip(import_path, export_path):
+    dataloader = DataLoader(
+        import_path)
+    processor = Processor()
+    exporter = Exporter(
+        export_path)
+
+    s = Pipeline([dataloader, processor, exporter])
+
+    while s():
+        print(str(s))
+
+    # try:
+    #     for wp in s():
+    #         print(str(wp))
+    # except TypeError:
+    #     pass
+
+    return exporter.filename
 
 
 def allowed_file(filename):

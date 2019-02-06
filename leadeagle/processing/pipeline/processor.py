@@ -49,8 +49,8 @@ class Processor(NodeBase):
     def __call__(self, input=None):
         # data_object = input.__next__()
         for data_object in input:
-            print('Processing file ' +
-                  data_object['facets']['input_data']['meta']['filepath'])
+            print('Processing file '
+                  + data_object['facets']['input_data']['meta']['filepath'])
             yield from self.process_single_image(data_object)
             # yield data_object
             # data_object = input.__next__()
@@ -60,8 +60,6 @@ class Processor(NodeBase):
         Iterates through the region properties and exports images containing each object
         '''
 
-        objects = []
-        # bar = ProgressBar(len(properties)), max_width=40)
         for i, property in enumerate(properties):
 
             src_img = data_object['facets']['input_data']['image']
@@ -103,14 +101,11 @@ class Processor(NodeBase):
 
             contours_masked = contour_image
 
-
-            # vars(property) => robustes property.__dict__
             new_object = dict(
+                object_id='{}_{}'.format(data_object['object_id'], i),
                 raw_img=dict(
                     id=i,
-                    meta=dict(
-                        properties=property,
-                    ),
+                    meta=dict(properties=property),
                     image=original_masked
                 ),
                 contour_img=dict(
@@ -119,12 +114,6 @@ class Processor(NodeBase):
             )
 
             yield new_object
-
-        #     bar.numerator = i + 1
-        #     print(bar, end="\r")
-
-        # print()
-        # data_object['facets']['processed_data'] = objects
 
     def process_single_image(self, data_object):
         src = self.correct_vignette(
@@ -141,9 +130,6 @@ class Processor(NodeBase):
         areaThreshold = 30
         properties = measure.regionprops(markers, coordinates='rc')
         properties = [p for p in properties if p.area > areaThreshold]
-
-        # Save the calculated properties and images to a dictionary
-        # data_object['facets']['raw_img']['meta']['regionprops'] = properties
 
         yield from self.export_image_regions(data_object, properties)
 

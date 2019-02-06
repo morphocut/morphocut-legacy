@@ -20,10 +20,10 @@ import cv2 as cv
 # print(str(wp))
 
 dataloader = DataLoader(
-    r"C:\Users\Christian\Documents\Masterprojekt\LeadEagle\Test\M138 T4 200A cleaned")
+    r"C:\Bibliotheken\Dokumente\hiwi_geomar\LeadEagle\Test\Images for Rainer\M138 T4 400A cleaned")
 processor = Processor()
 exporter = Exporter(
-    r"C:\Users\Christian\Documents\Masterprojekt\LeadEagle\Test\M138 T4 200A cleaned")
+    r"C:\Bibliotheken\Dokumente\hiwi_geomar\LeadEagle\Test\Images for Rainer\M138 T4 400A cleaned")
 
 
 #  vignettierung als eigenen node

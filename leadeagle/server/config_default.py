@@ -18,3 +18,5 @@ UPLOAD_FOLDER = 'static'
 # Upload Settings
 ALLOWED_EXTENSIONS = set(
     ['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'])
+
+SEND_FILE_MAX_AGE_DEFAULT = 0
