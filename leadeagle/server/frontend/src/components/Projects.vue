@@ -24,9 +24,16 @@
               <td>{{ dataset.id }}</td>
               <td>{{ dataset.name }}</td>
               <td>{{ dataset.objects }}</td>
-              <td><div v-if="dataset.download_running">
+              <td>
+                <div v-if="dataset.download_running" style="display: flex;">
                   <div class="loader"></div>
-                </div></td>
+                  <p style="width: 10px;"></p>
+                  <p>Processing...</p>
+                </div>
+                <div v-if="dataset.download_path && !dataset.download_running">
+                  <p>Download Ready!</p>
+                </div>
+              </td>
               <td>
                 <button
                   type="button"
@@ -81,9 +88,6 @@ export default {
       }
     };
   },
-  // props: {
-  //   dataset
-  // },
   methods: {
     getDatasets() {
       const path = "/api/datasets";
