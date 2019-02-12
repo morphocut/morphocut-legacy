@@ -59,10 +59,10 @@ Fixes.
 
 ## Week 8 (19-01-28)
 
-- [ ] Intra-Node computation with `graph.Sequential` (see `experiments.graph`)
-- [ ] Tests
+- [x] Intra-Node computation with `graph.Sequential` (see `experiments.graph`)
+- [x] Tests
 
-## Pending
+## Week 9 (19-02-11 - 19-02-22)
 
 Implement processing nodes.
 
