@@ -41,6 +41,17 @@ def test_dataloader():
         index_files=[]
     )
     assert options == ground_truth
+    output = [f for f in dataloader()]
+    assert len(output) == 3
+
+
+def test_processor():
+    import_path = os.path.dirname(os.path.realpath(__file__))
+    dataloader = DataLoader(import_path)
+    vignette_corrector = VignetteCorrector()
+    processor = Processor()
+    output = [f for f in processor(vignette_corrector(dataloader()))]
+    assert len(output) == 30
 
 
 # TESTDB = 'test_project.db'

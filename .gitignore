@@ -8,3 +8,4 @@ leadeagle/static/datasets/*
 leadeagle/server/static/datasets/*
 experiments/results
 leadeagle/server/static/*
+htmlcov/*
