@@ -150,20 +150,15 @@ def upload(id):
 def process_and_zip(import_path, export_path):
     dataloader = DataLoader(
         import_path)
+    vignette_corrector = VignetteCorrector()
     processor = Processor()
     exporter = Exporter(
         export_path)
 
-    s = Pipeline([dataloader, processor, exporter])
+    s = Pipeline([dataloader, vignette_corrector, processor, exporter])
 
     while s():
         print(str(s))
-
-    # try:
-    #     for wp in s():
-    #         print(str(wp))
-    # except TypeError:
-    #     pass
 
     return exporter.filename
 

@@ -49,7 +49,8 @@ class DataLoader(NodeBase):
         if self.index is None:
             self._make_index()
 
-        extensions = set(os.path.splitext(f)[1] for f in self.index["files"])
+        extensions = set(os.path.splitext(f['filepath'])[-1]
+                         for f in self.index["files"])
 
         object_extensions = {".jpeg", ".jpg", ".png", ".gif", ".tif"}
 
@@ -58,7 +59,7 @@ class DataLoader(NodeBase):
         index_extensions = {".tsv", ".csv"}
 
         index_files = [f for f in self.index["files"]
-                       if os.path.splitext(f)[1] in index_extensions]
+                       if os.path.splitext(f['filepath'])[-1] in index_extensions]
 
         return {
             "object_extensions": object_extensions,

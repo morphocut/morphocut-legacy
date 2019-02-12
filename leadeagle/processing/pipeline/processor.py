@@ -22,38 +22,31 @@ import math
 
 class Processor(NodeBase):
     """
-    An importing node. Imports images based on the filepath
+    A processing node. Performs segmentation on images to find objects and their region properties 
     """
 
-    # {
-    #     object_id: ...
-    #     facets: {
-    #         # For DataLoader
-    #         input_data: {
-    #             meta: {filename: ...},
-    #             image: <np.array of shape = [h,w,c]>
-    #         },
-    #         # For Processor
-    #         raw_img: {
-    #             meta: {region props...},
-    #             image: <np.array of shape = [h,w,c]>
-    #         },
-    #         contour_img: {
-    #             meta: {},
-    #             image: <np.array of shape = [h,w,c]>
-    #         },
-    #         # Nothing for export
-    #     }
-    # }
-
     def __call__(self, input=None):
-        # data_object = input.__next__()
         for data_object in input:
-            print('Processing file '
-                  + data_object['facets']['input_data']['meta']['filepath'])
+            print('Processing file ' +
+                  data_object['facets']['input_data']['meta']['filepath'])
             yield from self.process_single_image(data_object)
-            # yield data_object
-            # data_object = input.__next__()
+
+    def process_single_image(self, data_object):
+        src = data_object['facets']['corrected_data']['image']
+
+        # Segment foreground objects from background objects using thresholding with the otsu method
+        _, mask = cv.threshold(src, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
+        mask = cv.bitwise_not(mask)
+
+        # Find connected components in the masked image to identify individual objects
+        _, markers = cv.connectedComponents(mask)
+
+        # Retrieve regionprops of the connected components and filter out those who are smaller than 30 pixels in area
+        areaThreshold = 30
+        properties = measure.regionprops(markers, coordinates='rc')
+        properties = [p for p in properties if p.area > areaThreshold]
+
+        yield from self.export_image_regions(data_object, properties)
 
     def export_image_regions(self, data_object, properties):
         '''
@@ -115,23 +108,19 @@ class Processor(NodeBase):
 
             yield new_object
 
-    def process_single_image(self, data_object):
-        src = self.correct_vignette(
-            data_object['facets']['input_data']['image'])
 
-        # Segment foreground objects from background objects using thresholding with the otsu method
-        _, mask = cv.threshold(src, 0, 255, cv.THRESH_BINARY | cv.THRESH_OTSU)
-        mask = cv.bitwise_not(mask)
+class VignetteCorrector(NodeBase):
+    """
+    A processing node. Removes the vignette effect from images.
+    """
 
-        # Find connected components in the masked image to identify individual objects
-        _, markers = cv.connectedComponents(mask)
-
-        # Retrieve regionprops of the connected components and filter out those who are smaller than 30 pixels in area
-        areaThreshold = 30
-        properties = measure.regionprops(markers, coordinates='rc')
-        properties = [p for p in properties if p.area > areaThreshold]
-
-        yield from self.export_image_regions(data_object, properties)
+    def __call__(self, input=None):
+        for data_object in input:
+            data_object['facets']['corrected_data'] = dict(
+                image=self.correct_vignette(
+                    data_object['facets']['input_data']['image'])
+            )
+            yield data_object
 
     def correct_vignette(self, img):
 

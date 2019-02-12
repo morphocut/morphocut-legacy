@@ -22,6 +22,9 @@ setup(
         'Flask-Migrate',
         'timer_cm',
         'fire',
-        'Flask-Cors'
+        'Flask-Cors',
+        'pytest',
+        'coverage',
+        'pytest-cov'
     ],
 )
