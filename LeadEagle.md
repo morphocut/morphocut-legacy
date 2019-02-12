@@ -238,11 +238,13 @@ A processing node provides a data structure that completely describes the requir
     ```
     {
         object_id: ...
+        [create: True,]
         facets: {
         	# For DataLoader
             input_data: {
                 meta: {filename: ...},
-                image: <np.array of shape = [h,w,c]>
+                image: <np.array of shape = [h,w,c]>,
+                [create: True,]
             },
             # For Processor
             raw_img: {
@@ -258,12 +260,74 @@ A processing node provides a data structure that completely describes the requir
     }
     ```
 
+- Vignetting correction: `__init__(self, input_facet: str, output_facet: str, [params...])`
+
 - Image Segmentation class: ~ process_single_image
+  `__init__(self, input_facet: str, output_facet: str, min_object_area=None, padding=None, ...)`
 
   - Iterates over values of data generator
   - Outputs single ROI as object
 
 - Ecotaxa export class: ~ export_data
 
+  `__init__(self, input_facet: str, output_facet: str, output_path, ...)`
+
   - Iterates over values of segmentation
   - Writes ZIP
+
+- Database Persistence class
+
+  - Reads objects dict
+  - Creates object (if necessary, `create: True`)
+  - Creates corresponding facets (if necessary, `create: True`)
+  - Creates image files, stores `image_url`
+
+  ```{
+  {
+     	object_id: ...
+      create: true,
+      facets: {
+      	# For DataLoader
+          input_data: {
+              meta: {filename: ...},
+              image: <np.array of shape = [h,w,c]>,
+              create: true,
+              image_url: ..., # When file is available on disk
+          },
+      }
+  }`
+  ```
+
+## Database persistence of objects
+- After Data loader
+- After Processing
+
+## Classification
+
+- > Rainer: some objects are vignetted several times, 
+  > because there is a big one that contains several small ones.
+
+  Is this really the case? Then: https://docs.opencv.org/3.4/d9/d8b/tutorial_py_contours_hierarchy.html
+
+  > Fred: Only the large one should be kept, although some smaller ones could be 
+  > extracted as well. This is typical from a fecal aggregate for instance 
+  > (a lager phytoplankton aggregates containing small fecal pellets and/or 
+  > fragments a larger fecal pellets). This as such constitutes a category. 
+  > I would keep them as it is. However, if it is possible to get info on 
+  > what sort of FP are included in them, it's obviously relevant 
+  > information.
+
+-	Categories:
+
+  -	Phytoplankton aggregates
+  -	Fecal aggregates
+
+  -	single cells (if any...)
+
+  -	Cylindrical FP
+
+  -	Ovoid FP
+
+  -	unclear (we could put in this category what we are unsure off for now, 
+    and decide later together)
+

@@ -55,11 +55,14 @@ Fixes.
 
 - [ ] Make download work
 - [x] Include contour images in ecotaxa export
-- [ ] Draw contours only for one object in single-object image ("Vignette")
-- [ ] Intra-Node computation with `graph.Sequential` (see `experiments.graph`)
-- [ ] Tests
+- [x] Draw contours only for one object in single-object image ("Vignette")
 
-## Week 8
+## Week 8 (19-01-28)
+
+- [x] Intra-Node computation with `graph.Sequential` (see `experiments.graph`)
+- [x] Tests
+
+## Week 9 (19-02-11 - 19-02-22)
 
 Implement processing nodes.
 
