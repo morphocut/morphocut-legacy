@@ -1,39 +1,37 @@
-from flask_cors import CORS
-from flask import jsonify
 import faulthandler
 import itertools
+import json
 import os
+import pathlib
+import urllib.parse
 from getpass import getpass
 from time import sleep
 
 import click
+import flask
 import flask_migrate
 import h5py
 import pandas as pd
-from etaprogress.progress import ProgressBar
-import flask
-from flask import (Flask, Response, abort, redirect, render_template, request,
-                   url_for)
-import json
-import urllib.parse
-import pathlib
-
-from flask.helpers import send_from_directory
-from flask.blueprints import Blueprint
 import sqlalchemy
+from etaprogress.progress import ProgressBar
+from flask import (Flask, Response, abort, jsonify, redirect, render_template,
+                   request, url_for)
+from flask.blueprints import Blueprint
+from flask.helpers import send_from_directory
+from flask_cors import CORS
 from sqlalchemy import func
 from sqlalchemy.exc import IntegrityError
+from sqlalchemy.sql import and_, intersect, select, union
 from sqlalchemy.sql.expression import bindparam
-from sqlalchemy.sql import select, and_, union, intersect
 from timer_cm import Timer
 from werkzeug.security import check_password_hash, generate_password_hash
 from werkzeug.utils import secure_filename
 
-from leadeagle.server import models
 from leadeagle import segmentation
+from leadeagle.processing.pipeline import *
+from leadeagle.server import models
 from leadeagle.server.extensions import database, migrate, redis_store
 from leadeagle.server.frontend import frontend
-from leadeagle.processing.pipeline import *
 
 api = Blueprint("api", __name__)
 
