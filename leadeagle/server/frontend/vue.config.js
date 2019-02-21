@@ -1,5 +1,6 @@
 module.exports = {
     baseUrl: "/frontend",
+    assetsDir: "static",
     devServer: {
         proxy: {
             '/static': {
