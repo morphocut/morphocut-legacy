@@ -1,3 +1,4 @@
+import datetime
 import faulthandler
 import itertools
 import json
@@ -146,19 +147,27 @@ def upload(id):
 
 
 def process_and_zip(import_path, export_path):
-    dataloader = DataLoader(
-        import_path)
-    vignette_corrector = VignetteCorrector()
-    processor = Processor()
-    exporter = Exporter(
-        export_path)
+    # If the path does not exist, create it
+    if not os.path.exists(export_path):
+        os.makedirs(export_path)
 
-    s = Pipeline([dataloader, vignette_corrector, processor, exporter])
+    output_fn = os.path.join(
+        export_path,
+        'ecotaxa_segmentation_{:%Y_%m_%d}_{}.zip'.format(
+            datetime.datetime.now(), self.random_string(7)))
 
-    while s():
-        print(str(s))
+    pipeline = Pipeline([
+        DataLoader(import_path),
+        VignetteCorrector(),
+        Processor(),
+        Exporter(output_fn)
+    ])
 
-    return exporter.filename
+    # Execute pipeline
+    # We don't expect any output here
+    pipeline()
+
+    return output_fn
 
 
 def allowed_file(filename):

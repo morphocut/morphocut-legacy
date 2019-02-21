@@ -21,25 +21,21 @@ import string
 
 class Exporter(NodeBase):
     """
-    An importing node. Imports images based on the filepath
+    Ecotaxa Export
+
+    Writes a .zip-Archive with the following entries:
+        - ecotaxa_segmentation.csv
+        - <objid>.png
+        - <objid>_contours.png
+
+    TODO: Make exported images configurable
     """
 
-    def __init__(self, location):
-        self.location = location
-        self.init_date = datetime.datetime.now().strftime('%Y_%m_%d')
-        self.filename = 'ecotaxa_segmentation_{}_{}.zip'.format(
-            self.init_date, self.random_string(7))
+    def __init__(self, archive_fn):
+        self.archive_fn = archive_fn
 
     def __call__(self, input=None):
-        # Define the filename and full path for the zip file
-        zip_filename = self.filename
-        zip_filepath = os.path.join(self.location, zip_filename)
-
-        # If the path does not exist, create it
-        if not os.path.exists(self.location):
-            os.makedirs(self.location)
-
-        with ZipFile(zip_filepath, 'w', zipfile.ZIP_DEFLATED) as myzip:
+        with ZipFile(self.archive_fn, 'w', zipfile.ZIP_DEFLATED) as myzip:
 
             prop_list = []
             prop_list.append(self.get_property_column_types())
@@ -70,6 +66,9 @@ class Exporter(NodeBase):
             filepath = 'ecotaxa_segmentation.tsv'
             prop_frame.to_csv(sio, sep='\t', encoding='utf-8', index=False)
             myzip.writestr(filepath, sio.getvalue())
+
+        # Exporter has no output
+        yield None
 
     def get_property_column_types(self):
         '''
