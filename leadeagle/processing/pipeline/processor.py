@@ -112,11 +112,9 @@ class VignetteCorrector(NodeBase):
             yield data_object
 
     def correct_vignette(self, img):
-
         grey_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         flat_image = F.calculate_flat_image(grey_img)
         corrected_img = grey_img / flat_image
         corrected_img = rescale_intensity(corrected_img)
-        corrected_img = img_as_ubyte(corrected_img)
 
         return corrected_img
