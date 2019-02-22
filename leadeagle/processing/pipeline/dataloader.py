@@ -1,24 +1,3 @@
-# {
-#     object_id: ...
-#     facets: {
-#         # For DataLoader
-#         input_data: {
-#             meta: {filename: ...},
-#             image: <np.array of shape = [h,w,c]>
-#         },
-#         # For Processor
-#         raw_img: {
-#             meta: {region props...},
-#             image: <np.array of shape = [h,w,c]>
-#         },
-#         contour_img: {
-#             meta: {},
-#             image: <np.array of shape = [h,w,c]>
-#         },
-#         # Nothing for export
-#     }
-# }
-
 
 """
 Input nodes
@@ -34,6 +13,18 @@ class DataLoader(NodeBase):
     Read the contents of a local directory and yield processing objects.
 
     Source node (no predecessors).
+
+    Output:
+
+    {
+        object_id: ...
+        facets: {
+            input_data: {
+                meta: {filename: ...},
+                image: <np.array of shape = [h,w,c]>
+            }
+        }
+    }
     """
 
     def __init__(self, location, object_extensions=None):

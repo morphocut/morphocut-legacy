@@ -22,6 +22,21 @@ import string
 class Exporter(NodeBase):
     """
     An importing node. Imports images based on the filepath
+
+    Input:
+
+    {
+        object_id: ...
+        raw_img: {
+            id: ...
+            meta: {region props...},
+            image: <np.array of shape = [h,w,c]>
+        },
+        contour_img: {
+            image: <np.array of shape = [h,w,c]>
+        }
+    }
+
     """
 
     def __init__(self, location):

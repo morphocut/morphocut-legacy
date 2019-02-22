@@ -140,10 +140,6 @@ def upload(id):
             }
             add_object(_object)
             print('save file')
-            # return redirect(url_for('uploaded_file',
-            #                         filename=filename))
-    elif request.method == 'PUT':
-        print('put put put')
     return jsonify(response_object)
 
 
@@ -151,7 +147,7 @@ def process_and_zip(import_path, export_path):
     dataloader = DataLoader(
         import_path)
     vignette_corrector = VignetteCorrector()
-    processor = Processor()
+    processor = Processor(min_object_area=30, padding=0.5)
     exporter = Exporter(
         export_path)
 

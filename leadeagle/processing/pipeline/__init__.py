@@ -9,3 +9,4 @@ from leadeagle.processing.pipeline.importer import *
 from leadeagle.processing.pipeline.processor import *
 from leadeagle.processing.pipeline.dataloader import *
 from leadeagle.processing.pipeline.exporter import *
+from leadeagle.processing.pipeline.vignette_corrector import *

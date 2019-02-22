@@ -23,12 +23,47 @@ import math
 class Processor(NodeBase):
     """
     A processing node. Performs segmentation on images to find objects and their region properties 
+
+    Input:
+
+    {
+        object_id: ...
+        facets: {
+            input_data: {
+                meta: {filename: ...},
+                image: <np.array of shape = [h,w,c]>
+            }
+            corrected_data: {
+                image: <np.array of shape = [h,w,c]>
+            }
+        }
+    }
+
+    Output:
+
+    {
+        object_id: ...
+        raw_img: {
+            id: ...
+            meta: {region props...},
+            image: <np.array of shape = [h,w,c]>
+        },
+        contour_img: {
+            image: <np.array of shape = [h,w,c]>
+        }
+    }
+
+
     """
+
+    def __init__(self, min_object_area=None, padding=None):
+        self.min_object_area = min_object_area
+        self.padding = padding
 
     def __call__(self, input=None):
         for data_object in input:
-            print('Processing file ' +
-                  data_object['facets']['input_data']['meta']['filepath'])
+            print('Processing file '
+                  + data_object['facets']['input_data']['meta']['filepath'])
             yield from self.process_single_image(data_object)
 
     def process_single_image(self, data_object):
@@ -42,9 +77,10 @@ class Processor(NodeBase):
         _, markers = cv.connectedComponents(mask)
 
         # Retrieve regionprops of the connected components and filter out those who are smaller than 30 pixels in area
-        areaThreshold = 30
         properties = measure.regionprops(markers, coordinates='rc')
-        properties = [p for p in properties if p.area > areaThreshold]
+        if (self.min_object_area):
+            properties = [p for p in properties if p.area
+                          > self.min_object_area]
 
         yield from self.export_image_regions(data_object, properties)
 
@@ -64,8 +100,12 @@ class Processor(NodeBase):
             h = property.bbox[3] - property.bbox[1]
 
             # Define bordersize based on the width and height of the object. The border size specifies how much of the image around the object is shown in its image.
-            bordersize_w = int(w / 2)
-            bordersize_h = int(h / 2)
+            if (self.padding):
+                bordersize_w = int(w * self.padding)
+                bordersize_h = int(h * self.padding)
+            else:
+                bordersize_w = 0
+                bordersize_h = 0
 
             # Calculate min and max values for the border around the object, so that there are no array errors (no value below 0, no value above max width/height).
             xmin = max(0, x - bordersize_w)
@@ -107,27 +147,3 @@ class Processor(NodeBase):
             )
 
             yield new_object
-
-
-class VignetteCorrector(NodeBase):
-    """
-    A processing node. Removes the vignette effect from images.
-    """
-
-    def __call__(self, input=None):
-        for data_object in input:
-            data_object['facets']['corrected_data'] = dict(
-                image=self.correct_vignette(
-                    data_object['facets']['input_data']['image'])
-            )
-            yield data_object
-
-    def correct_vignette(self, img):
-
-        grey_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
-        flat_image = proc.calculate_flat_image(grey_img)
-        corrected_img = grey_img / flat_image
-        corrected_img = rescale_intensity(corrected_img)
-        corrected_img = img_as_ubyte(corrected_img)
-
-        return corrected_img
