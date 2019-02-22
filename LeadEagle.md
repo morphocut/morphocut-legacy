@@ -154,6 +154,18 @@ Everything that takes more than 0.5s-1s.
 
 - Use [Flask-RQ2](https://flask-rq2.readthedocs.io/en/latest/) to enqueue background jobs.
 
+- API:
+
+  - `POST /api/jobs/`: Create a job
+    Response:  `202 Accepted, Location: /api/jobs/<jobid>`
+  - ...
+
+- Resources:
+
+  - https://blog.miguelgrinberg.com/post/the-flask-mega-tutorial-part-xxii-background-jobs
+  - https://farazdagi.com/2014/rest-and-long-running-jobs/
+  - https://flask-marshmallow.readthedocs.io/en/latest/
+
 ## Misc
 
 - Splitting metadata field: https://stackoverflow.com/questions/38231591/splitting-dictionary-list-inside-a-pandas-column-into-separate-columns
@@ -331,3 +343,13 @@ A processing node provides a data structure that completely describes the requir
   -	unclear (we could put in this category what we are unsure off for now, 
     and decide later together)
 
+## Authorization
+
+- First step: Projects are owned by user. Only user may see data
+- Later: Allow shared access to projects
+
+## Data Storage
+
+- Data is owned by project
+- Storage location: `<root>/<user_id>/<project_id>/<node_id>/`
+- Not in `static`!
