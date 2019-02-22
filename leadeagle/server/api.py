@@ -1,3 +1,5 @@
+import string
+import random
 import datetime
 import faulthandler
 import itertools
@@ -102,8 +104,8 @@ def process_dataset_route(id):
                 # download_filename = segmentation.process(
                 #     import_path, export_path)
 
-                print('download path: '
-                      + relative_download_path + download_filename)
+                print('download path: ' +
+                      relative_download_path + download_filename)
                 response_object['download_path'] = relative_download_path + \
                     download_filename
                 response_object['download_filename'] = download_filename
@@ -146,6 +148,10 @@ def upload(id):
     return jsonify(response_object)
 
 
+def random_string(n):
+    return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(n))
+
+
 def process_and_zip(import_path, export_path):
     # If the path does not exist, create it
     if not os.path.exists(export_path):
@@ -154,7 +160,7 @@ def process_and_zip(import_path, export_path):
     output_fn = os.path.join(
         export_path,
         'ecotaxa_segmentation_{:%Y_%m_%d}_{}.zip'.format(
-            datetime.datetime.now(), self.random_string(7)))
+            datetime.datetime.now(), random_string(7)))
 
     pipeline = Pipeline([
         DataLoader(import_path),

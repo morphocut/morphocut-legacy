@@ -130,6 +130,3 @@ class Exporter(NodeBase):
         }
 
         return propDict
-
-    def random_string(self, n):
-        return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(n))
