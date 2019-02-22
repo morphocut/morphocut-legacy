@@ -25,6 +25,7 @@ setup(
         'Flask-Cors',
         'pytest',
         'coverage',
-        'pytest-cov'
+        'pytest-cov',
+        'tqdm',
     ],
 )

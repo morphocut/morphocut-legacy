@@ -1,28 +1,17 @@
-from leadeagle.processing.pipeline import NodeBase
-import cv2 as cv
-import numpy as np
-import argparse
-from skimage import measure
-import pandas as pd
-import os
-from parse import *
-import sys
-from etaprogress.progress import ProgressBar
-import matplotlib.pyplot as plt
-import datetime
-from io import StringIO
-from zipfile import ZipFile
-import zipfile
-import leadeagle.processing.functional as proc
+import math
+
+from skimage import img_as_ubyte, measure
 from skimage.exposure import rescale_intensity
 from skimage.morphology import binary_dilation, disk
-from skimage import img_as_ubyte
-import math
+
+import cv2 as cv
+import leadeagle.processing.functional as F
+from leadeagle.processing.pipeline import NodeBase
 
 
 class Processor(NodeBase):
     """
-    A processing node. Performs segmentation on images to find objects and their region properties 
+    A processing node. Performs segmentation on images to find objects and their region properties
 
     Input:
 

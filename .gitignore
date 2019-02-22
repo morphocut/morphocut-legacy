@@ -9,3 +9,4 @@ leadeagle/server/static/datasets/*
 experiments/results
 leadeagle/server/static/*
 htmlcov/*
+.coverage

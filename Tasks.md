@@ -59,10 +59,14 @@ Fixes.
 
 ## Week 8 (19-01-28)
 
-- [x] Intra-Node computation with `graph.Sequential` (see `experiments.graph`)
+- [x] Intra-Node computation with `processing.Pipeline` (see `experiments.graph`)
 - [x] Tests
 
 ## Week 9 (19-02-11 - 19-02-22)
+
+- [ ] Configuration of Processing Nodes
+    - Input / Output slots
+    - Parameters
 
 Implement processing nodes.
 
