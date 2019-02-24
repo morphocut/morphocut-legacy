@@ -30,7 +30,7 @@ from werkzeug.utils import secure_filename
 
 from leadeagle import segmentation
 from leadeagle.processing.pipeline import *
-from leadeagle.server import models
+from leadeagle.server import models, helpers
 from leadeagle.server.extensions import database, migrate, redis_store
 from leadeagle.server.frontend import frontend
 
@@ -102,8 +102,8 @@ def process_dataset_route(id):
                 # download_filename = segmentation.process(
                 #     import_path, export_path)
 
-                print('download path: '
-                      + relative_download_path + download_filename)
+                print('download path: ' +
+                      relative_download_path + download_filename)
                 response_object['download_path'] = relative_download_path + \
                     download_filename
                 response_object['download_filename'] = download_filename
@@ -147,16 +147,17 @@ def process_and_zip(import_path, export_path):
     if not os.path.exists(export_path):
         os.makedirs(export_path)
 
-    output_fn = os.path.join(
+    output_fn = 'ecotaxa_segmentation_{:%Y_%m_%d}_{}.zip'.format(
+        datetime.datetime.now(), helpers.random_string(n=7))
+    output_fp = os.path.join(
         export_path,
-        'ecotaxa_segmentation_{:%Y_%m_%d}_{}.zip'.format(
-            datetime.datetime.now(), self.random_string(7)))
+        output_fn)
 
     pipeline = Pipeline([
         DataLoader(import_path),
         VignetteCorrector(),
-        Processor(),
-        Exporter(output_fn)
+        Processor(min_object_area=30, padding=0.5),
+        Exporter(output_fp)
     ])
 
     # Execute pipeline

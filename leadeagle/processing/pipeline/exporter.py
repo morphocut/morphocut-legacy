@@ -50,6 +50,7 @@ class Exporter(NodeBase):
         self.archive_fn = archive_fn
 
     def __call__(self, input=None):
+        print('exporter call')
         with ZipFile(self.archive_fn, 'w', zipfile.ZIP_DEFLATED) as myzip:
 
             prop_list = []
@@ -145,6 +146,3 @@ class Exporter(NodeBase):
         }
 
         return propDict
-
-    def random_string(self, n):
-        return ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(n))
