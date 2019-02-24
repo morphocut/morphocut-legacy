@@ -64,10 +64,20 @@ Fixes.
 
 ## Week 9 (19-02-11 - 19-02-22)
 
-- [ ] Configuration of Processing Nodes
+## Week 19 (19-02-25 - 19-03-01)
+
+- [ ] Configuration of Pipeline Nodes
     - Input / Output slots
     - Parameters
+- [ ] Graylevel features
+- [ ] `img_rank` in ecotaxa output.
+- [ ] Set background to white (alpha configurable)
+- [ ] Run processing in background: Specification & Implementation
+    - See MorphoCluster, Readme
+- [ ] Account management: Specification & Implementation
+    - MorphoCluster does not have this.
 
+# Later
 Implement processing nodes.
 
 - [ ] UI: Browse & Create processing nodes
