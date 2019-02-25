@@ -29,9 +29,22 @@ objects = Table('objects', metadata,
                        default=datetime.datetime.now),
                 Column('modification_date', DateTime,
                        default=datetime.datetime.now),
-                Column('dataset_id', Integer, ForeignKey(
-                    'datasets.dataset_id'), index=True),
+                Column('project_id', Integer, ForeignKey(
+                    'projects.project_id'), index=True),
                 )
+
+
+#: :type facets: sqlalchemy.sql.schema.Table
+facets = Table('facets', metadata,
+               Column('object_id', Integer, primary_key=True),
+               Column('filename', String),
+               Column('creation_date', DateTime,
+                      default=datetime.datetime.now),
+               Column('modification_date', DateTime,
+                      default=datetime.datetime.now),
+               Column('dataset_id', Integer, ForeignKey(
+                   'datasets.dataset_id'), index=True),
+               )
 
 #: :type objects: sqlalchemy.sql.schema.Table
 users = Table('users', metadata,
@@ -40,3 +53,24 @@ users = Table('users', metadata,
               Column('pwhash', String),
               Column('admin', Boolean, default=False),
               )
+
+
+#: :type projects: sqlalchemy.sql.schema.Table
+projects = Table('projects', metadata,
+                 Column('project_id', Integer, primary_key=True),
+                 Column('name', String),
+                 Column('author', String),
+                 Column('active', Boolean),
+                 Column('creation_date', DateTime,
+                        default=datetime.datetime.now),
+                 )
+
+#: :type contributors: sqlalchemy.sql.schema.Table
+contributors = Table('contributors', metadata,
+                     Column('project_id', Integer),
+                     Column('user_id', Integer),
+                     Column('project_id', Integer, ForeignKey(
+                         'projects.project_id'), index=True),
+                     Column('user_id', Integer, ForeignKey(
+                         'users.user_id'), index=True),
+                     )

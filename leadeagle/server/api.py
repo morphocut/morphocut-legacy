@@ -177,17 +177,11 @@ def process_and_zip(import_path, export_path):
 
     pipeline = Pipeline([
         DataLoader(import_path),
-        VignetteCorrector(),
-        Processor(min_object_area=30, padding=0.5),
+        MultiThreadPipeline([
+            VignetteCorrector(),
+            Processor(min_object_area=30, padding=0.5)]),
         Exporter(output_fp)
     ])
-
-    # Execute pipeline
-    # We don't expect any output here
-    # pipeline()
-
-    # # for p in pipeline():
-    # #     print(str(p))
 
     pipeline.execute()
 

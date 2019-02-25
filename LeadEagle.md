@@ -312,7 +312,50 @@ A processing node provides a data structure that completely describes the requir
 
 ## Database persistence of objects
 - After Data loader
+
 - After Processing
+
+- ```
+  DatasetReader: 
+  Converts files to objects
+  
+  for i in index:
+  yield
+  {
+     	object_id: ...
+      create: true,
+      facets: {
+          raw_image: {
+              meta: {None},
+              image: Image(files[i]),
+              create: true,
+          },
+      }
+  }
+  
+  When processing:
+  
+  for r in regions:
+  yield
+  {
+     	object_id: parent_id + idx
+      create: true,
+      parent_id: parent_id,
+      parent_bbox: ...
+      facets: {
+          mask: {
+              image: Image,
+          },
+      }
+  }
+  
+  
+  Image class:
+  	Image(filename, bbox=None)
+  	get() -> np.ndarray
+  ```
+
+  
 
 ## Classification
 

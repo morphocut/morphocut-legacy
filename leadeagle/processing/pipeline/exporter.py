@@ -64,7 +64,7 @@ class Exporter(NodeBase):
                     1].tostring()
                 myzip.writestr(filename, img_str)
                 prop_list.append(
-                    self.get_properties_list(data_object, filename))
+                    self.get_properties_list(data_object, filename, img_rank=1))
 
                 filename = "{}_{}.png".format(
                     data_object['object_id'], 'contours')
@@ -72,7 +72,7 @@ class Exporter(NodeBase):
                     1].tostring()
                 myzip.writestr(filename, img_str)
                 prop_list.append(
-                    self.get_properties_list(data_object, filename))
+                    self.get_properties_list(data_object, filename, img_rank=2))
 
             # Transform the list into a dataframe
             prop_frame = pd.DataFrame(prop_list)
@@ -91,6 +91,7 @@ class Exporter(NodeBase):
         Returns the column types for the columns in the tsv file for the ecotaxa export
         '''
         propDict = {'img_file_name': '[t]',
+                    'img_rank': '[f]',
                     'object_id': '[t]',
                     'object_date': '[t]',
                     'object_time': '[t]',
@@ -115,34 +116,45 @@ class Exporter(NodeBase):
                     }
         return propDict
 
-    def get_properties_list(self, data_object, filename):
+    def get_properties_list(self, data_object, filename, img_rank):
         '''
         Transforms the region properties of the data object into the tsv export format.
         '''
         property = data_object['raw_img']['meta']['properties']
         propDict = {
-            'img_file_name': filename,
-            'object_id': data_object['object_id'],
+            'img_file_name': filename,  # img_file_name
+            'img_rank': img_rank,  # img_rank
+            'object_id': data_object['object_id'],  # object_id
+            # object_date
             'object_date': str(datetime.datetime.now().strftime('%Y%m%d')),
+            # object_time
             'object_time': str(datetime.datetime.now().strftime('%H%M%S')),
+            # object_width
             'object_width': property.bbox[3] - property.bbox[1],
+            # object_height
             'object_height': property.bbox[2] - property.bbox[0],
-            'object_area': property.area,
-            'object_major_axis_length': property.major_axis_length,
-            'object_minor_axis_length': property.minor_axis_length,
-            'object_bounding_box_area': property.bbox_area,
-            'object_centroid_row': property.centroid[0],
-            'object_centroid_col': property.centroid[1],
-            'object_convex_area': property.convex_area,
-            'object_eccentricity': property.eccentricity,
+            'object_bx': property.bbox[1],
+            'object_by': property.bbox[0],
+            'object_circ.': (4 * math.pi * property.area) / math.pow(property.perimeter, 2),
+            'object_area': property.area,  # object_area
+            'object_major_axis_length': property.major_axis_length,  # object_major_axis_length
+            'object_minor_axis_length': property.minor_axis_length,  # object_minor_axis_length
+            'object_bounding_box_area': property.bbox_area,  # object_bounding_box_area
+            'object_y': property.centroid[0],  # object_centroid_row
+            'object_x': property.centroid[1],  # object_centroid_col
+            'object_convex_area': property.convex_area,  # object_convex_area
+            'object_eccentricity': property.eccentricity,  # object_eccentricity
+            # object_equivalent_diameter
             'object_equivalent_diameter': property.equivalent_diameter,
-            'object_euler_number': property.euler_number,
-            'object_extent': property.extent,
-            'object_filled_area': property.filled_area,
+            'object_euler_number': property.euler_number,  # object_euler_number
+            'object_extent': property.extent,  # object_extent
+            'object_filled_area': property.filled_area,  # object_filled_area
+            # object_local_centroid_row
             'object_local_centroid_row': property.local_centroid[0],
+            # object_local_centroid_col
             'object_local_centroid_col': property.local_centroid[1],
-            'object_perimeter': property.perimeter,
-            'object_solidity': property.solidity,
+            'object_perim.': property.perimeter,  # object_perimeter
+            'object_solidity': property.solidity,  # object_solidity
         }
 
         return propDict
