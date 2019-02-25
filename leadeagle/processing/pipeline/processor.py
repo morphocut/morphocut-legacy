@@ -50,6 +50,7 @@ class Processor(NodeBase):
         self.padding = padding
 
     def __call__(self, input=None):
+        print('processor call')
         for data_object in input:
             print('Processing file '
                   + data_object['facets']['input_data']['meta']['filepath'])

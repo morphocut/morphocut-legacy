@@ -30,11 +30,33 @@ from werkzeug.utils import secure_filename
 
 from leadeagle import segmentation
 from leadeagle.processing.pipeline import *
-from leadeagle.server import models, helpers
+from leadeagle.server import models, helpers, leadeagle
 from leadeagle.server.extensions import database, migrate, redis_store
 from leadeagle.server.frontend import frontend
 
 api = Blueprint("api", __name__)
+
+
+@api.route('/users', methods=['GET', 'POST'])
+def get_users_route():
+    response_object = {'status': 'success'}
+    if request.method == 'POST':
+        post_data = request.get_json()
+        if post_data is not None:
+            pwhash = pwhash = generate_password_hash(
+                post_data['password'], method='pbkdf2:sha256:10000', salt_length=12)
+            leadeagle.add_user_to_database(
+                post_data['username'], pwhash, post_data['admin'])
+            response_object['message'] = 'User added!'
+    else:
+        with database.engine.begin() as connection:
+            result = connection.execute(select(
+                [sqlalchemy.text('*')])
+                .select_from(models.users))
+            users = [dict(row) for row in result]
+
+            response_object['users'] = users
+    return jsonify(response_object)
 
 
 @api.route('/datasets/<id>/files', methods=['GET'])
@@ -102,8 +124,8 @@ def process_dataset_route(id):
                 # download_filename = segmentation.process(
                 #     import_path, export_path)
 
-                print('download path: ' +
-                      relative_download_path + download_filename)
+                print('download path: '
+                      + relative_download_path + download_filename)
                 response_object['download_path'] = relative_download_path + \
                     download_filename
                 response_object['download_filename'] = download_filename
@@ -162,7 +184,12 @@ def process_and_zip(import_path, export_path):
 
     # Execute pipeline
     # We don't expect any output here
-    pipeline()
+    # pipeline()
+
+    # # for p in pipeline():
+    # #     print(str(p))
+
+    pipeline.execute()
 
     return output_fn
 
@@ -220,6 +247,13 @@ def add_dataset(dataset):
     print('add_dataset: ' + str(dataset))
     try_insert_or_update(models.datasets.insert(), [dict(
         name=dataset['name'], path=dataset['name'], active=True)], "datasets")
+    return
+
+
+def add_user(user):
+    print('add user: ' + str(user))
+    try_insert_or_update(models.users.insert(), [dict(
+        username=dataset['name'], path=dataset['name'], active=True)], "datasets")
     return
 
 

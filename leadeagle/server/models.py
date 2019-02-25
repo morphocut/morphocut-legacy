@@ -38,4 +38,5 @@ users = Table('users', metadata,
               Column('user_id', Integer, primary_key=True),
               Column('username', String),
               Column('pwhash', String),
+              Column('admin', Boolean, default=False),
               )

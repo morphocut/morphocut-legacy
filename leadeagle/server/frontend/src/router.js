@@ -5,6 +5,7 @@ import Ping from '@/components/Ping';
 import Upload from '@/components/Upload';
 import Datasets from '@/components/Datasets';
 import Projects from '@/components/Projects';
+import Accounts from '@/components/Accounts';
 
 Vue.use(Router)
 
@@ -37,9 +38,6 @@ export default new Router({
       component: Datasets,
     },
     {
-      //@Christian: Use sensible resource paths!
-      // Like in e.g. https://restfulapi.net/resource-naming/
-      // Don't pass objects, but identifiers!
       path: '/datasets/:dataset_id/upload',
       name: 'Upload',
       component: Upload,
@@ -51,6 +49,11 @@ export default new Router({
       path: '/projects',
       name: 'Projects',
       component: Projects,
+    },
+    {
+      path: '/users',
+      name: 'Accounts',
+      component: Accounts,
     },
   ]
 })

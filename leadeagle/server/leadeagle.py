@@ -75,7 +75,8 @@ def reset_db():
 
 @app.cli.command()
 @click.argument('username')
-def add_user(username):
+@click.option('--admin/--no-admin', default=False)
+def add_user(username, admin):
     print("Adding user {}:".format(username))
     password = getpass("Password: ")
     password_repeat = getpass("Retype Password: ")
@@ -91,10 +92,15 @@ def add_user(username):
     pwhash = generate_password_hash(
         password, method='pbkdf2:sha256:10000', salt_length=12)
 
+    add_user_to_database(username, pwhash, admin)
+
+
+def add_user_to_database(username, pwhash, admin):
+    print('username: {}, pw: {}, admin: {}'.format(username, pwhash, admin))
     try:
         with database.engine.connect() as conn:
             stmt = models.users.insert(
-                {"username": username, "pwhash": pwhash})
+                {"username": username, "pwhash": pwhash, 'admin': admin})
             conn.execute(stmt)
     except IntegrityError as e:
         print(e)
@@ -116,7 +122,7 @@ def index():
 # ===============================================================================
 
 
-def check_auth(username, password):
+def check_auth(username, password, admin_rights):
     # Retrieve entry from the database
     with database.engine.connect() as conn:
         stmt = models.users.select(
@@ -126,19 +132,26 @@ def check_auth(username, password):
         if user is None:
             return False
 
-    return check_password_hash(user["pwhash"], password)
+    return check_password_hash(user["pwhash"], password) and ((not admin_rights) or user['admin'])
 
 
 @app.before_request
 def require_auth():
     # exclude 404 errors and static routes
     # uses split to handle blueprint static routes as well
+
+    admin_rights = False
+
     if not request.endpoint or request.endpoint.rsplit('.', 1)[-1] == 'static':
         return
 
+    if 'users' in request.endpoint:
+        admin_rights = True
+
     auth = request.authorization
 
-    success = check_auth(auth.username, auth.password) if auth else None
+    success = check_auth(auth.username, auth.password,
+                         admin_rights) if auth else None
 
     if not auth or not success:
         if success is False:
