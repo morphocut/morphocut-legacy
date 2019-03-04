@@ -29,8 +29,8 @@ objects = Table('objects', metadata,
                        default=datetime.datetime.now),
                 Column('modification_date', DateTime,
                        default=datetime.datetime.now),
-                Column('project_id', Integer, ForeignKey(
-                    'projects.project_id'), index=True),
+                Column('dataset_id', Integer, ForeignKey(
+                    'datasets.dataset_id'), index=True),
                 )
 
 

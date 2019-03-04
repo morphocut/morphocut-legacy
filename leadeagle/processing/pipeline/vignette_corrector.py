@@ -47,7 +47,7 @@ class VignetteCorrector(NodeBase):
     """
 
     def __call__(self, input=None):
-        print('vignette_corrector call ' + str(input))
+        # print('vignette_corrector call ' + str(input))
         for data_object in input:
             data_object['facets']['corrected_data'] = dict(
                 image=self.correct_vignette(
@@ -56,7 +56,7 @@ class VignetteCorrector(NodeBase):
             yield data_object
 
     def correct_vignette(self, img):
-
+        print('Correcting vignette...')
         grey_img = cv.cvtColor(img, cv.COLOR_BGR2GRAY)
         flat_image = proc.calculate_flat_image(grey_img)
         corrected_img = grey_img / flat_image

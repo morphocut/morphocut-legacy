@@ -17,11 +17,8 @@ class Pipeline(NodeBase):
 
     def __call__(self, input=None):
         wp = input
-        print('wp = ' + str(wp))
         for n in self.sequence:
-            print('pipeline step: ' + str(n))
             wp = n(wp)
-            print('wp = ' + str(wp))
         return wp
 
     def execute(self):

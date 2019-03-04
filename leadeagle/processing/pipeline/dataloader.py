@@ -72,7 +72,6 @@ class DataLoader(NodeBase):
         self.index = index
 
     def __call__(self, input=None):
-        print('dataloader call ' + str(self.index['files']))
         return DataLoaderIter(self.index["files"])
 
 
