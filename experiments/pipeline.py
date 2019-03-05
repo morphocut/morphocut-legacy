@@ -1,5 +1,5 @@
 import os
-from leadeagle.processing.pipeline import *
+from morphocut.processing.pipeline import *
 from timer_cm import Timer
 
 input_path = "/data1/mschroeder/Datasets/18-10-15_Sediment_Trap_Fred_LeMoigne/*/"

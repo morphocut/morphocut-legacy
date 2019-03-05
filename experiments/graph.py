@@ -1,4 +1,4 @@
-from leadeagle.processing.pipeline import *
+from morphocut.processing.pipeline import *
 import os
 import cv2 as cv
 
@@ -7,7 +7,7 @@ import cv2 as cv
 #         "/home/moi/Work/18-10-15 Sediment Trap Fred LeMoigne")
 # else:
 #     input = LocalDirectoryInput(
-#         r"C:\Users\Christian\Documents\Masterprojekt\LeadEagle\Test\M138 T4 200A cleaned")
+#         r"C:\Users\Christian\Documents\Masterprojekt\morphocut\Test\M138 T4 200A cleaned")
 
 # print(input.get_options())
 
@@ -20,10 +20,10 @@ import cv2 as cv
 # print(str(wp))
 
 dataloader = DataLoader(
-    r"C:\Bibliotheken\Dokumente\hiwi_geomar\LeadEagle\Test\Images for Rainer\M138 T4 400A cleaned")
+    r"C:\Bibliotheken\Dokumente\hiwi_geomar\morphocut\Test\Images for Rainer\M138 T4 400A cleaned")
 processor = Processor()
 exporter = Exporter(
-    r"C:\Bibliotheken\Dokumente\hiwi_geomar\LeadEagle\Test\Images for Rainer\M138 T4 400A cleaned")
+    r"C:\Bibliotheken\Dokumente\hiwi_geomar\morphocut\Test\Images for Rainer\M138 T4 400A cleaned")
 
 
 #  vignettierung als eigenen node

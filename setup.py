@@ -1,8 +1,8 @@
 from setuptools import setup
 
 setup(
-    name='leadeagle',
-    packages=['leadeagle'],
+    name='morphocut',
+    packages=['morphocut'],
     include_package_data=True,
     install_requires=[
         'flask',
