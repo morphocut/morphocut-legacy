@@ -27,5 +27,6 @@ setup(
         'coverage',
         'pytest-cov',
         'tqdm',
+        'parse',
     ],
 )
