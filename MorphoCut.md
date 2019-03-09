@@ -310,7 +310,32 @@ A processing node provides a data structure that completely describes the requir
   }`
   ```
 
+### Full Pipeline
+
+```python
+Pipeline([
+    DataLoader(import_path, output_facette="raw"),
+    VignetteCorrector(input_facette="raw", output_facette="color"),
+    RGB2Gray(input_facette="color", output_facette="gray"),
+    ThresholdOtsu(input_facette="gray", output_facette="mask"),
+    ExtractRegions(
+    	mask_facette="mask",
+    	image_facettes=["color", "gray"],
+    	output_facet="features",
+    	padding=10),
+    FadeBackground(input_facette="gray", output_facette="gray_faded", alpha=0.5, color=1.0),
+    DrawContours(input_facette="color", output_facette="color_countours"),
+    Exporter(
+    	"/path/to/archive.zip",
+    	prop_facettes=["features"],
+    	img_facettes=["gray_faded", "color", "color_contours"])
+])
+```
+
+
+
 ## Database persistence of objects
+
 - After Data loader
 
 - After Processing
