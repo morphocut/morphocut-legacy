@@ -332,8 +332,6 @@ Pipeline([
 ])
 ```
 
-
-
 ## Database persistence of objects
 
 - After Data loader
@@ -421,3 +419,8 @@ Pipeline([
 - Data is owned by project
 - Storage location: `<root>/<user_id>/<project_id>/<node_id>/`
 - Not in `static`!
+
+## Image dimensions
+
+- Images are arrays of shape (h,w,c)
+- We use the openCV color channel order (BGR).

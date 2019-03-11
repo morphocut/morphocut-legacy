@@ -5,6 +5,9 @@ from timer_cm import Timer
 input_path = "/data1/mschroeder/Datasets/18-10-15_Sediment_Trap_Fred_LeMoigne/*/"
 export_path = "/tmp/M138_T4_200A_cleaned.zip"
 
+# input_path = "/data1/mschroeder/Datasets/19-02-21-FredLeMoigne/test.jpeg"
+# export_path = "/tmp/M138 T7 200A 1.zip"
+
 num_workers = None
 
 try:
@@ -13,15 +16,5 @@ except OSError:
     pass
 
 with Timer("Total time"):
-    pipeline = Pipeline([
-        DataLoader(input_path),
-        Progress("loaded"),
-        # MultiThreadPipeline([
-        VignetteCorrector(),
-        Processor(),
-        # ], num_workers),
-        Exporter(export_path)
-    ])
-
-    for x in pipeline():
-        print(x)
+    pipeline = get_default_pipeline(input_path, export_path)
+    pipeline.execute()
