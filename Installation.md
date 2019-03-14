@@ -7,7 +7,7 @@
 ```shell
 wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 sh Miniconda3-latest-Linux-x86_64.sh
-conda create -n morphocut python=3.7 h5py numpy pandas scipy
+conda create -n morphocut python=3.7 h5py numpy pandas scipy -c conda-forge cmake cxx-compiler
 conda activate morphocut
 ssh-keygen -t rsa
 # [Add SSH key as deploy key]
@@ -17,4 +17,3 @@ git clone https://<deploy-token>:<password>@git.informatik.uni-kiel.de/sms/morph
 cd morphocut
 pip install -e .
 ```
-
