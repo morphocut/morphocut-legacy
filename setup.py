@@ -14,12 +14,14 @@ setup(
         'scikit-learn',
         'scipy',
         'redis',
+        'rq',
         'hiredis',
         'flask-restful',
         'alembic',
         'Flask-SQLAlchemy',
         'flask-redis',
         'Flask-Migrate',
+        'flask-user',
         'timer_cm',
         'fire',
         'Flask-Cors',
@@ -28,5 +30,8 @@ setup(
         'pytest-cov',
         'tqdm',
         'parse',
+        'scikit-image',
+        'opencv-python==3.4.3.18',
+        'opencv-contrib-python==3.4.3.18'
     ],
 )
