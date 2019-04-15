@@ -4,9 +4,7 @@
 activate
 experiments/*.zip
 experiments/segmentation_export*
-morphocut/static/datasets/*
-morphocut/server/static/datasets/*
 experiments/results
-morphocut/server/static/*
+morphocut/server/data/*
 htmlcov/*
 .coverage
