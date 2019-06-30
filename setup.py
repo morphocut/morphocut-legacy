@@ -32,7 +32,7 @@ setup(
         'parse',
         'scikit-image',
         'opencv-python==3.4.3.18',
-        'opencv-contrib-python==3.4.3.18'
+        'opencv-contrib-python==3.4.3.18',
         'pillow-simd',
     ],
 )
