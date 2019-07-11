@@ -1,9 +1,12 @@
 from setuptools import setup
+import versioneer
 
 setup(
     name='morphocut',
     packages=['morphocut'],
     include_package_data=True,
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     install_requires=[
         'flask',
         'psycopg2-binary',

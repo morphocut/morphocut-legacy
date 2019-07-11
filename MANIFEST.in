@@ -2,4 +2,5 @@ include LICENSE
 include server/schema.sql
 graft server/static
 graft server/templates
-global-exclude *.pyc
+global-exclude *.pycinclude versioneer.py
+include morphocut/_version.py
