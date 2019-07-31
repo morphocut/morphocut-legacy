@@ -4,3 +4,4 @@ graft server/static
 graft server/templates
 global-exclude *.pycinclude versioneer.py
 include morphocut/_version.py
+include versioneer.py
