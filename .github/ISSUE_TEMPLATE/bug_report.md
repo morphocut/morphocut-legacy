@@ -24,8 +24,8 @@ A clear and concise description of what you expected to happen.
 If applicable, add screenshots to help explain your problem.
 
 **Software**
+ - Python: [e.g. Python 3.7]
  - OS: [e.g. iOS]
- - Browser [e.g. chrome, safari]
 
 **Additional context**
 Add any other context about the problem here.
